@@ -28,18 +28,19 @@ class VaribleErrorTest1 {
         int myNumber = 12;
         // 这里不能先进行使用
         // 编译错误：并没有定义，内存中无法知道
-        System.out.println(myAge);
-        int myAge = 20;
+        // System.out.println(myAge);
+        System.out.println(myNumber);
+        // int myAge = 20;
     }
 }
 
-class VaribleErrorTest2 {
-    public static void main(String[] args) {
-        int myNumber = 12;
-        // 这里不能先进行使用
-        int myAge;
-        // 编译错误：虽然已定义，但未赋值，也不行
-        System.out.println(myAge);
-        myAge = 20;
-    }
-}
+// class VaribleErrorTest2 {
+//     public static void main(String[] args) {
+//         int myNumber = 12;
+//         // 这里不能先进行使用
+//         int myAge;
+//         // 编译错误：虽然已定义，但未赋值，也不行
+//         System.out.println(myAge);
+//         myAge = 20;
+//     }
+// }

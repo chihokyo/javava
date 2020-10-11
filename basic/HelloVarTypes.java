@@ -69,8 +69,9 @@ public class HelloVarTypes {
         boolean isAnimal = true;
         System.out.println(isAnimal);
         boolean isPerson = false;
+        
         if (isPerson) {
-            System.out.println("I am Human");
+            System.out.println("I am Human! \nHello Human");
         } else {
             System.out.println("WangWang!");
         }
