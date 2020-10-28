@@ -122,7 +122,7 @@ class Exception2 {
         }
         System.out.println("-----test2-----");
 
-        // try结构声明的变量不能被外面调用。和if很像
+        // try结构声明的变量不能被外面调用。和if很像 只能在try里面进行调用！ catch都不行
         // System.out.println(num);
 
     }
