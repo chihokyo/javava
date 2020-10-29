@@ -32,8 +32,12 @@ class Student {
             System.out.println("这里只是输出，并不是异常");
             // throw new RuntimeException("RuntimeException: 您输入的数据非法"); //
             // 只有运行才能出现这里主动抛出一个异常
-            throw new Exception("Exception: 您输入的数据非法"); // 这里主动抛出一个异常 + throws Exception
+            // throw new Exception("Exception: 您输入的数据非法"); // 这里主动抛出一个异常 + throws Exception
             // ↑ 这里只是生成了一个异常对象，在方法内。
+
+            // 关于自定义异常 这里抛出的异常必须是一个异常类的对象
+            // throw new String("输入的非法");
+            throw new MyException("输入的非法");
         }
     }
 }
