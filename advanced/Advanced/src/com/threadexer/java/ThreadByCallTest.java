@@ -18,7 +18,6 @@ public class ThreadByCallTest {
         // 创建 Callable 接口实现类的对象
         NumberThread numberThread = new NumberThread();
         // 将这个Callable 接口实现类的对象作为参数穿度到 FutureTask 的构造器当中 创建 FutureTask对象
-        // 强制类型转换
         FutureTask futureTask = new FutureTask(numberThread);
         // FutureTask对象作为参数传递到Thread类构造器中，创建 Thread对象
         new Thread(futureTask).start();
