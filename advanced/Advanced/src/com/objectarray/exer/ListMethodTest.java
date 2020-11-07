@@ -110,5 +110,20 @@ public class ListMethodTest {
             // 注意这里已经不是数组了，而是List数据 所以不能使用下标
             System.out.println(list.get(i));
         }
+
+        System.out.println("********关于remove一个练习***********");
+
+        List listRemove = new ArrayList();
+        listRemove.add(1);
+        listRemove.add(2);
+        listRemove.add(3);
+
+        // 1 默认remove就是删除索引2
+        // listRemove.remove(2);
+        System.out.println(listRemove); // [1, 2]
+        // 2 如果想要删除数据2
+        listRemove.remove(Integer.valueOf(2));
+        System.out.println(listRemove); // [1, 3]
+
    } 
 }
