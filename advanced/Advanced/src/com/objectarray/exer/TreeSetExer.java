@@ -14,7 +14,7 @@ public class TreeSetExer {
     public static void main(String[] args) {
         
         // 问题1 使用自然排序 compareTo 按照名字 return this.name.compareTo(e.name);
-        TreeSet set = new TreeSet();
+        TreeSet<Employee> set = new TreeSet<Employee>();
 
         Employee e1 = new Employee("liudehua",55,new MyDate(1965,5,4));
         Employee e2 = new Employee("zhangxueyou",43,new MyDate(1987,5,4));
@@ -37,15 +37,11 @@ public class TreeSetExer {
 
         
 
-        TreeSet set2 = new TreeSet(new Comparator(){
+        TreeSet<Employee> set2 = new TreeSet<Employee>(new Comparator<>(){
             @Override
-            public int compare(Object o1, Object o2) {
-                if (o1 instanceof Employee && o2 instanceof Employee) {
-                    Employee e1 = (Employee)o1;
-                    Employee e2 = (Employee)o2;
-
-                    MyDate b1 = e1.getBirthday();
-                    MyDate b2 = e2.getBirthday();
+            public int compare(Employee o1, Employee o2) {
+                    MyDate b1 = o1.getBirthday();
+                    MyDate b2 = o2.getBirthday();
 
                     // 方法1
                     // int minusYear = b1.getYear() - b2.getYear();
@@ -61,10 +57,7 @@ public class TreeSetExer {
                     // return b1.getDay() - b2.getDay();
 
                     // 方法2
-                    return b1.compareTo(b2);
-
-                }
-                throw new RuntimeException("传入的数据类型不一致");
+                return b1.compareTo(b2);
             }
         });
 
@@ -80,7 +73,7 @@ public class TreeSetExer {
         set2.add(ee4);
         set2.add(ee5);
 
-        Iterator ite2 = set2.iterator();
+        Iterator<Employee> ite2 = set2.iterator();
         while (ite2.hasNext()) {
             System.out.println(ite2.next());
         }
@@ -92,7 +85,7 @@ public class TreeSetExer {
  * 定义一个 Employee类
  */
 
-class Employee implements Comparable {
+class Employee implements Comparable<Employee> {
 
     private String name;
     private int age;
@@ -146,6 +139,7 @@ class Employee implements Comparable {
         return this;
     }
 
+
     @Override
     public boolean equals(Object o) {
         if (o == this)
@@ -161,6 +155,7 @@ class Employee implements Comparable {
     public int hashCode() {
         return Objects.hash(name, age, birthday);
     }
+    
 
     @Override
     public String toString() {
@@ -172,13 +167,8 @@ class Employee implements Comparable {
     }
 
    @Override
-   public int compareTo(Object o) {
-       if (o instanceof Employee) {
-           Employee e = (Employee)o;
-           return this.name.compareTo(e.name);
-       }
-
-       throw new RuntimeException("传入类型不一致");
+   public int compareTo(Employee o) {
+        return this.name.compareTo(o.name);
    }
 
 }
@@ -188,7 +178,7 @@ class Employee implements Comparable {
  * MyDate 类
  * private成员变量year,month,day；并为每一个属性定义 getter, setter 方法
  */
-class MyDate implements Comparable {
+class MyDate implements Comparable<MyDate> {
 
     private int year;
     private int month;
@@ -239,25 +229,18 @@ class MyDate implements Comparable {
 
 
     @Override
-    public int compareTo(Object o) {
-        if(o instanceof MyDate){
-            MyDate m = (MyDate)o;
-
-            //比较年
-            int minusYear = this.getYear() - m.getYear();
+    public int compareTo(MyDate o) {
+        int minusYear = this.getYear() - o.getYear();
             if(minusYear != 0){
                 return minusYear;
             }
             //比较月
-            int minusMonth = this.getMonth() - m.getMonth();
+            int minusMonth = this.getMonth() - o.getMonth();
             if(minusMonth != 0){
                 return minusMonth;
             }
             //比较日
-            return this.getDay() - m.getDay();
-        }
-
-        throw new RuntimeException("传入的数据类型不一致！");
+            return this.getDay() - o.getDay();
 
     }
 }
