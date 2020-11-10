@@ -1,6 +1,6 @@
 package com.generic.exer;
 /**
- * 自定义泛型类
+ * 自定义泛型类/接口
  */
 public class OrderGenericTest {
     

@@ -14,6 +14,10 @@ import java.util.Map.Entry;
  * 3 int 这种基础数据类型不能作为泛型的数据类型 必须是这些的包装类
  * 4 在集合中使用泛型
  * 
+ * 泛型结构包括 1 泛型类 2 泛型接口 3 泛型方法
+ * 
+ *      其实泛型类和泛型接口几乎是一样的，接口也就是一个不能被实例化并且支持多重实现抽象的类呗。
+ * 
  */
 public class GenericTest {
     public static void main(String[] args) {
