@@ -20,6 +20,13 @@ import java.sql.Date;
  *      [java有一个常量，匹配所有系统分隔符]
  * 5 基本使用方法
  * 
+ * 6 注意一个小点
+ * 当硬盘中有真实的文件或者目录的时候，创建File对象的时候，属性会显式赋值
+ * 如果不存在的时候，除了指定的目录和路径之外，其余的属性都是取成员变量的默认值
+ * 比如 length → 0
+ * 比如 isFile → false
+ * 比如 isRead → false
+ * 
  */
 public class FileTest {
     public static void main(String[] args) {
@@ -109,6 +116,33 @@ public class FileTest {
         // true
         // false
         
+        // 关于文件目录的创建
+        // 假设 想创建的目录的上层目录是存在的 /Users/Chihokyo/Code/javava
+        // mkdirs 和 mkdir 是一样效果的
+        File fileDir = new File("/Users/Chihokyo/Code/javava/dir");
+        boolean resultD =  fileDir.mkdir();
+        // boolean resultD =  fileDir.mkdirs();
+        if (resultD) {
+            System.out.println("dir文件夹创建成功!");
+        }
+
+        // 假设 想创建的目录的上层目录是不存在的 /Users/Chihokyo/Code/javava1
+         // mkdirs OK 并且把父目录不存在的也一并创建了
+         // mkdir NG
+        File fileDir2 = new File("/Users/Chihokyo/Code/javava1/dir2");
+        boolean resultD2 = fileDir2.mkdir();
+        if (resultD2) {
+            System.out.println("dir2文件夹创建成功");
+        } else {
+            System.out.println("dir2文件夹创建失败"); // dir2文件夹创建失败
+        }
+
+        boolean resultD3 = fileDir2.mkdirs();
+        if (resultD3) {
+            System.out.println("dir2文件夹创建成功"); //dir2文件夹创建成功
+        } else {
+            System.out.println("dir2文件夹创建失败"); 
+        }
 
     }
 }
