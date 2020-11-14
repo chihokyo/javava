@@ -14,10 +14,10 @@ import java.io.IOException;
  *      BufferedReader
  *      BufferedWriter
  * 
- * 2作用是什么
+ * 2 作用是什么
  *      提高流的读取写入的速度，提高速度的原因：提供了缓冲区
  * 
- * 3 处理流。就是桃姐在基础流的基础进行增强。
+ * 3 处理流。就是在基础流的基础进行增强。
  */
 
 public class BufferInputStreamTest {
