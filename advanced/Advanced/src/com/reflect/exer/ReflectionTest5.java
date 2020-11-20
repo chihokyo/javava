@@ -1,7 +1,7 @@
 package com.reflect.exer;
 
 import java.io.Serializable;
-import java.lang.reflect.Field;
+import java.lang.reflect.*;
 
 /**
  * 通过反射获取类的完整结构
@@ -11,7 +11,7 @@ public class ReflectionTest5 {
 
         Class<Animal> clazzA = Animal.class;
 
-        // 1. 获取属性结构 
+        // 1. 获取属性结构
         // getFields() 获取当前运行类&父类中声明为public访问权限的属性
         Field[] fields = clazzA.getFields();
         for (Field field : fields) {
@@ -29,13 +29,12 @@ public class ReflectionTest5 {
             System.out.println(field);
         }
 
-        // 父类的就没了 比如 weight  gender 
+        // 父类的就没了 比如 weight gender
         // private java.lang.String com.reflect.exer.Animal.name
         // int com.reflect.exer.Animal.age
         // public int com.reflect.exer.Animal.id
         // private static final long com.reflect.exer.Animal.serialVersionUID
         System.out.println("*******华丽的分割线");
-
 
         // 2. 获取权限修饰符 数据类型 变量名
         Class<Animal> clazzB = Animal.class;
@@ -45,7 +44,7 @@ public class ReflectionTest5 {
             // 这里的权限修饰符，是返回一个数字，这个数字代表的就是权限
             // 需要去转换
             int modifier = field.getModifiers();
-            System.out.println(modifier); // 26
+            System.out.println(Modifier.toString(modifier)); // private static final
             // 2 数据类型
             Class<?> type = field.getType();
             System.out.println(type.getName()); // long
@@ -58,7 +57,6 @@ public class ReflectionTest5 {
     }
 }
 
-
 class Creature<T> implements Serializable {
 
     private static final long serialVersionUID = 2L;
@@ -68,10 +66,12 @@ class Creature<T> implements Serializable {
     private void breath() {
         System.out.println("生物都可以呼吸");
     }
+
     public void eat() {
         System.out.println("生物都要吃东西");
     }
 }
+
 /**
  * 自定义一个接口
  */
@@ -79,9 +79,7 @@ interface Myinterface {
     void info();
 }
 
-
-class Animal extends Creature<String> implements
-Comparable<String>, Myinterface {
+class Animal extends Creature<String> implements Comparable<String>, Myinterface {
 
     private String name;
     int age;
@@ -90,15 +88,17 @@ Comparable<String>, Myinterface {
     private static final long serialVersionUID = 1L;
 
     public Animal() {
-        
+
     }
+
     public Animal(String name) {
         this.name = name;
     }
+
     // 默认权限构造器
     Animal(String name, int age) {
         this.name = name;
-        this.age = age;    
+        this.age = age;
     }
 
     public String getName() {
@@ -115,8 +115,9 @@ Comparable<String>, Myinterface {
         return type;
 
     }
+
     // 共有方法 public
-    public String descInfo(String desc) {
+    public String descInfo(String desc) throws NullPointerException, ClassCastException {
         return desc;
     }
 
@@ -125,6 +126,7 @@ Comparable<String>, Myinterface {
     public void info() {
         System.out.println("Animal info()");
     }
+
     // 重写接口方法 Comparable
     @Override
     public int compareTo(String o) {
