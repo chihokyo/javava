@@ -109,6 +109,22 @@ class Animal extends Creature<String> implements Comparable<String>, Myinterface
         this.name = name;
     }
 
+    public int getAge() {
+        return this.age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    public int getId() {
+        return this.id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
     // 私有方法 private
     private String show(String type) {
         System.out.println("Animal show()");
@@ -121,6 +137,10 @@ class Animal extends Creature<String> implements Comparable<String>, Myinterface
         return desc;
     }
 
+    public static void staticMethod() {
+        System.out.println("这是Animal的静态方法staticMethod()");
+    }
+
     // 重写接口方法 Myinterface
     @Override
     public void info() {
@@ -131,6 +151,16 @@ class Animal extends Creature<String> implements Comparable<String>, Myinterface
     @Override
     public int compareTo(String o) {
         return 0;
+    }
+
+
+    @Override
+    public String toString() {
+        return "{" +
+            " name='" + getName() + "'" +
+            ", age='" + getAge() + "'" +
+            ", id='" + getId() + "'" +
+            "}";
     }
 
 }
