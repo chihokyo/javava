@@ -34,6 +34,6 @@ public class Printer implements Equipment {
 
     @Override
     public String getDescription() {
-        return name + "(" + type + ")"
+        return name + "(" + type + ")";
     }
 }
