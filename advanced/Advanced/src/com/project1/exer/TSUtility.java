@@ -74,9 +74,9 @@ public class TSUtility {
      * 读取键盘数字
      */
     public static String readKeyBoard(int limit, boolean blankReturn) {
-
         String line = "";
         while (scanner.hasNextLine()) {
+            line = scanner.nextLine();
             if (line.length() == 0) {
                 if (blankReturn)
                     return line;

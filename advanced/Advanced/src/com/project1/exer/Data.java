@@ -1,5 +1,9 @@
 package com.project1.exer;
-
+/**
+ * 模拟一下所有的数据类
+ * @version
+ * @author chin
+ */
 public class Data {
     // 员工常量
     public static final int EMPLOYEE = 10;
