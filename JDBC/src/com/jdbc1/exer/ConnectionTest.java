@@ -78,7 +78,6 @@ public class ConnectionTest {
 
         // 2 加载驱动
         Class.forName(driverClass);
-
         // 3 获取连接
         Connection conn = DriverManager.getConnection(url, user, password);
         System.out.println(conn);
