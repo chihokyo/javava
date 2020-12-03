@@ -8,9 +8,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Properties;
 
-import com.mysql.jdbc.Statement;
-
-
 public class JDBCUtils {
 
     /**
@@ -64,15 +61,7 @@ public class JDBCUtils {
      * @Description 关闭连接和Statement操作
      * @author chin
      */
-    public static void closeResource(Connection con, Statement ps, ResultSet rs) {
-        try {
-            if (rs != null) {
-                rs.close();
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
+    public static void closeResource(Connection con, PreparedStatement ps, ResultSet rs) {
         try {
             if (ps != null) {
                 ps.close();
@@ -84,6 +73,14 @@ public class JDBCUtils {
         try {
             if (con != null) {
                 con.close();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            if (rs != null) {
+                rs.close();
             }
         } catch (SQLException e) {
             e.printStackTrace();
