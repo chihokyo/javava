@@ -2,19 +2,21 @@ package com.jdbc1.exer;
 
 import java.lang.reflect.Field;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.util.Scanner;
 
 
 import com.jdbc.utils.JDBCUtils;
-import com.mysql.jdbc.PreparedStatement;
-import com.mysql.jdbc.ResultSetMetaData;
 
 import org.junit.Test;
 
 /**
  * 
  * @Description 演示使用 PreparedStatement 替换 掉 Statement 解决SQL注入问题
+ * 好处1 安全
+ * 好处2 可以快速执行批量操作
  * @author chin
  * @version
  */
@@ -22,23 +24,28 @@ public class PreparedStatementTest {
     @Test
     public void testLogin() {
 
-        Scanner scanner = new Scanner(System.in);
+        // Scanner scanner = new Scanner(System.in);
 
-        System.out.println("请输入用户名: ");
-        String user = scanner.nextLine();
-        System.out.println("请输入密码: ");
-        String pass = scanner.nextLine();
+        // System.out.println("请输入用户名: ");
+        // String user = scanner.nextLine();
+        // System.out.println("请输入密码: ");
+        // String pass = scanner.nextLine();
+        String user = "AA";
+        String pass = "123456";
 
         // SELECT user,password FROM user_table WHERE user = '1' or ' AND password =' =1
         // or '1' = '1';
         String sql = "SELECT user,password FROM user_table WHERE user = ? and password = ?";
 
         User returnUser = getInstance(User.class, sql, user, pass);
+
         if (returnUser != null) {
             System.out.println("OK");
         } else {
             System.out.println("NOOO!");
         }
+
+        // scanner.close();
 
     }
 
@@ -48,9 +55,8 @@ public class PreparedStatementTest {
      * @author chin
      * @param clazz 表
      * @param sql   sql语句
-     * @param 其他对象  Object... args
+     * @param Object  参数列表
      */
-    @Test
     public <T> T getInstance(Class<T> clazz, String sql, Object... args) {
 
         Connection conn = null;
@@ -69,7 +75,7 @@ public class PreparedStatementTest {
             // 4. 执行语句
             rs = ps.executeQuery();
             // 5. 获取结果集 元数据 ResultSetMetaData
-            ResultSetMetaData rsmd = (ResultSetMetaData) rs.getMetaData();
+            ResultSetMetaData rsmd = rs.getMetaData();
             // 6. 获取列数
             int columnCount = rsmd.getColumnCount();
 
