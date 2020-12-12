@@ -1,5 +1,5 @@
 /**
- * 插入排序
+ * 插入排序 -使用交换
  * 
  */
 public class InsertionSort {
@@ -17,7 +17,7 @@ public class InsertionSort {
             //            break;
             //        }
             //    }
-            
+
             // 可以看出来在for里面就一个if进行判断，那么可以直接缩写成这样
             for (int j = i; j - 1 >= 0 && arr[j].compareTo(arr[j - 1]) < 0; j--) {
                 swap(arr, j - 1, j);
