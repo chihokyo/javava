@@ -35,7 +35,9 @@ public class SortingHelper {
         if (sortname.equals("TestSelectionSort")) {
             TestSelectionSort.sort(arr);
         } else if (sortname.equals("InsertionSort")) {
-            TestSelectionSort.sort(arr);
+            InsertionSort.sort(arr);
+        } else if (sortname.equals("InsertionSort2")) {
+            InsertionSort2.sort(arr);
         }
         long endTime = System.nanoTime();
         double time = (endTime - startTime) / 1_000_000_000.0;
