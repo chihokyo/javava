@@ -34,6 +34,8 @@ public class SortingHelper {
         // 这里使用反射实现会更好
         if (sortname.equals("TestSelectionSort")) {
             TestSelectionSort.sort(arr);
+        } else if (sortname.equals("InsertionSort")) {
+            TestSelectionSort.sort(arr);
         }
         long endTime = System.nanoTime();
         double time = (endTime - startTime) / 1_000_000_000.0;
