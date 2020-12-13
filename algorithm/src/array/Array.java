@@ -6,24 +6,37 @@ package array;
  */
 public class Array {
     public static void main(String[] args) {
-        int[] arr = new int[20];
-        for (int i = 0; i < arr.length; i++) {
-            arr[i] = i;
-        }
 
-        int[] scores = new int[] { 100, 99, 90 };
-        for (int i = 0; i < scores.length; i++) {
-            System.out.println(scores[i]);
-        }
-        // 这里是体验可迭代性。复制了一份。
-        for (int i : scores) {
-            System.out.println(i);
-        }
+       NewArray arr = new NewArray(20);
 
-        scores[0] = 11; // 下标修改
-        for (int i : scores) {
-            System.out.println(i);
-        }
+       // 添加
+       for (int i = 0; i < 10; i++) {
+           arr.addFirst(i);
+       }
+       System.out.println(arr);
+       arr.add(2, 23);
+       System.out.println(arr);
+       arr.addFirst(-99);
+       System.out.println(arr);
+
+       // 修改
+       arr.set(0, 11);
+
+       // 查询
+       System.out.println(arr);
+       System.out.println(arr.get(3));
+       System.out.println(arr.find(4));
+
+       // 删除
+       arr.remove(2);
+       System.out.println(arr);
+       arr.removeFirst();
+       System.out.println(arr);
+       arr.removeLast();
+       System.out.println(arr);
+       arr.removeElement(23);
+       System.out.println(arr);
+
     }
 
 }
