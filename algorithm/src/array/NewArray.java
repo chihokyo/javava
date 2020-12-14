@@ -83,12 +83,17 @@ public class NewArray<E> {
      * @param e
      */
     public void add(int index, E e) {
-        if (size == data.length) {
-            throw new IllegalArgumentException("addlast failed.Array is full");
-        }
+        // if (size == data.length) {
+        //     throw new IllegalArgumentException("addlast failed.Array is full");
+        // }
         if (index < 0 || index > size) {
             throw new IllegalArgumentException("addlast failed.Require index < 0 and index > size ");
         }
+        // 动态数组，数组的容量是固定的。动态数组，自动扩容
+        if (size == data.length) {
+            resize(2 * data.length); 
+        }
+
         for (int i = size - 1; i >= index; i--) {
             data[i + 1] = data[i];
         }
@@ -98,12 +103,28 @@ public class NewArray<E> {
     }
 
     /**
+     * 获取最后一个元素值
+     */
+    public E getLast() {
+        // 不建议使用这样的方法，因为index会为-1
+        // return data[size - 1];
+        return get(size - 1);
+    }
+
+    /**
+     * 获取第一个值
+     */
+    public E getFirst() {
+        return get(0);
+    }
+
+    /**
      * 获取指定位置的元素 既可以检查index的有效性，又可以体现封装性，不会把没使用的空间暴露出去
      * 
      * @param index 指定位置
      * @return
      */
-    E get(int index) {
+    public E get(int index) {
         if (index < 0 || index >= size) {
             throw new IllegalArgumentException("Get failed. Index is illegal");
         }
@@ -171,6 +192,13 @@ public class NewArray<E> {
         size--; // 删除之后 size要-1 虽然size还有值，但是size其实那个值永远不会可见。（其实初始化的时候那个位置就是0了）
         // 这里要注意的是一点，就是删除的时候指针此时还会指向一个地址，loitering object != memory leak
         data[size] = null; // 手动进行null
+
+        // 动态缩减
+        // 在复杂度震荡的时候进行考虑 1不断的扩容缩容 2 有可能缩到0
+        if ( size == data.length / 4 && data.length / 2 != 0) {
+            resize(data.length / 2);
+        }
+        
         return ret;
     }
 
@@ -211,5 +239,18 @@ public class NewArray<E> {
         }
         res.append("]");
         return res.toString();
+    }
+
+    /**
+     * 数组空间扩容or缩减
+     * @param newCapacity
+     */
+    @SuppressWarnings("unchecked")
+    private void resize(int newCapacity) {
+        E[] newData = (E[])new Object[newCapacity];
+        for (int i = 0; i < size; i++) {
+            newData[i] = data[i];
+        }
+        data = newData;
     }
 }
