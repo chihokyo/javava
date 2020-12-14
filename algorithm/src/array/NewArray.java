@@ -3,9 +3,9 @@ package array;
 /**
  * 自己封装一个数组 1 capacity 表示数组的总容量，初始化大小。 2 size 表示实际容量。数组第一个没有元素的位置。 3 data 成员
  */
-public class NewArray {
+public class NewArray<E> {
 
-    private int[] data; // 成员属性
+    private E[] data; // 成员属性
     private int size; // 有效元素
     // 为什么不写 capacity 因为这个可以通过data.length 推断出来
 
@@ -14,8 +14,9 @@ public class NewArray {
      * 
      * @param capacity 容量
      */
+    @SuppressWarnings("unchecked")
     public NewArray(int capacity) {
-        data = new int[capacity];
+        data = (E[])new Object[capacity];
         size = 0;
     }
 
@@ -52,7 +53,7 @@ public class NewArray {
      * 
      * @param e 元素
      */
-    public void addLast(int e) {
+    public void addLast(E e) {
         // if (size == data.length) {
         //     throw new IllegalArgumentException("addlast failed.Array is full");
         // }
@@ -71,7 +72,7 @@ public class NewArray {
      * 
      * @param e 元素
      */
-    public void addFirst(int e) {
+    public void addFirst(E e) {
         add(0, e);
     }
 
@@ -81,7 +82,7 @@ public class NewArray {
      * @param index
      * @param e
      */
-    public void add(int index, int e) {
+    public void add(int index, E e) {
         if (size == data.length) {
             throw new IllegalArgumentException("addlast failed.Array is full");
         }
@@ -102,7 +103,7 @@ public class NewArray {
      * @param index 指定位置
      * @return
      */
-    int get(int index) {
+    E get(int index) {
         if (index < 0 || index >= size) {
             throw new IllegalArgumentException("Get failed. Index is illegal");
         }
@@ -115,7 +116,7 @@ public class NewArray {
      * @param index 指定位置
      * @param e     元素
      */
-    void set(int index, int e) {
+    void set(int index, E e) {
         if (index < 0 || index >= size) {
             throw new IllegalArgumentException("Set failed. Index is illegal");
         }
@@ -128,9 +129,9 @@ public class NewArray {
      * @param e 查找元素e
      * @return
      */
-    public boolean contains(int e) {
+    public boolean contains(E e) {
         for (int i = 0; i < size; i++) {
-            if (data[i] == e) {
+            if (data[i].equals(e)) {
                 return true;
             }
         }
@@ -143,9 +144,9 @@ public class NewArray {
      * @param e
      * @return
      */
-    public int find(int e) {
+    public int find(E e) {
         for (int i = 0; i < size; i++) {
-            if (data[i] == e) {
+            if (data[i].equals(e)) {
                 return i;
             }
         }
@@ -158,26 +159,28 @@ public class NewArray {
      * @param index 删除的index
      * @return
      */
-    public int remove(int index) {
+    public E remove(int index) {
         if (index < 0 || index >= size) {
             throw new IllegalArgumentException("Remove failed. Index is illegal");
         }
-        int ret = data[index];
+        E ret = data[index];
         // index之后的元素都向前移动
         for (int i = index + 1; i < size; i++) {
             data[i - 1] = data[i];
         }
         size--; // 删除之后 size要-1 虽然size还有值，但是size其实那个值永远不会可见。（其实初始化的时候那个位置就是0了）
+        // 这里要注意的是一点，就是删除的时候指针此时还会指向一个地址，loitering object != memory leak
+        data[size] = null; // 手动进行null
         return ret;
     }
 
     // 删除第一个元素
-    public int removeFirst() {
+    public E removeFirst() {
         return remove(0);
     }
 
     // 删除最后一个元素
-    public int removeLast() {
+    public E removeLast() {
         return remove(size - 1);
     }
 
@@ -186,7 +189,7 @@ public class NewArray {
      * 
      * @param e 需要删除的元素
      */
-    public void removeElement(int e) {
+    public void removeElement(E e) {
         // 先查找有没有这个元素
         int index = find(e);
         if (index != -1) {

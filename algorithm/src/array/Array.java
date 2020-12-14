@@ -1,5 +1,4 @@
 package array;
-
 /**
  * 关于数组
  * 
@@ -7,7 +6,7 @@ package array;
 public class Array {
     public static void main(String[] args) {
 
-       NewArray arr = new NewArray(20);
+       NewArray<Integer> arr = new NewArray<>(20);
 
        // 添加
        for (int i = 0; i < 10; i++) {
@@ -37,6 +36,17 @@ public class Array {
        arr.removeElement(23);
        System.out.println(arr);
 
+
+        /**
+         * 测试泛型类（Student）
+         */
+        
+        NewArray<Student> stuArr = new NewArray<>();
+        stuArr.addLast(new Student("Alice", 89));
+        stuArr.addLast(new Student("Alice2", 44));
+        stuArr.addLast(new Student("Tom", 19));
+        System.out.println(stuArr);
+        
     }
 
 }
