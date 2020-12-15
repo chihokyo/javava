@@ -79,4 +79,19 @@ public class TestQueue {
         }
     }
 
+    // 测试一个循环队列2 - 不用浪费1个空间
+    @Test
+    public void testLoopQueue2() {
+        LoopQueue2<Integer> queue = new LoopQueue2<>();
+        for (int i = 0; i < 10; i++) {
+            queue.enqueue(i);
+            System.out.println(queue);
+            // 每隔三个进行一次dequeue
+            if (i % 3 == 2) {
+                queue.dequeue();
+                System.out.println(queue);
+            }
+        }
+    }
+
 }
