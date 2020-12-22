@@ -4,20 +4,13 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>com.chin.maventest</groupId>
-  <artifactId>maven_demo</artifactId>
+  <groupId>com.chin.maven</groupId>
+  <artifactId>parent_maven</artifactId>
+  <!-- 父工程需要打包方式需要是pom -->
+  <packaging>pom</packaging>
   <version>1.0-SNAPSHOT</version>
 
-  <!-- 继承父工程 -->
-  <parent>
-    <groupId>com.chin.maven</groupId>
-    <artifactId>parent_maven</artifactId>
-    <version>1.0-SNAPSHOT</version>
-    <!-- 指定从当前pom.xml触发的父工程pom -->
-    <relativePath>../parent_maven/pom.xml</relativePath>
-  </parent>
-
-  <name>maven_demo</name>
+  <name>parent_maven</name>
   <!-- FIXME change it to the project's website -->
   <url>http://www.example.com</url>
 
@@ -27,12 +20,21 @@
     <maven.compiler.target>1.7</maven.compiler.target>
   </properties>
 
-  <dependencies>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-    </dependency>
-  </dependencies>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>4.12</version>
+        <scope>test</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <modules>
+    <module>../maven_demo</module>
+    <module>../maven_demo2</module>
+  </modules>
 
   <build>
     <pluginManagement><!-- lock down plugins versions to avoid using Maven defaults (may be moved to parent pom) -->
