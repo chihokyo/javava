@@ -40,7 +40,7 @@ public class CollectionTest {
         Collection coll = new ArrayList();
         coll.add("AA");
         coll.add("BB");
-        coll.add(123);
+        coll.add(123);// 自动装箱 这里只能放对象的
         coll.add(new Date()); // 自动装箱 其实放对象或者任何类型都可以
 
         // 2 size() 获取添加的元素的个数

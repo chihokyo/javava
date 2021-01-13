@@ -46,7 +46,7 @@ public class CollectionTest3 {
         System.out.println(list2); // [AAA, BBB]
 
         // 需要注意数字类型的转换 不能直接使用 int 而要用 Integer 包装类
-
+        // new int[] { 123, 456 } 这里整体会被认为是Object 而不是 数组
         List arr1 = Arrays.asList(new int[] { 123, 456 });
         System.out.println(arr1.size()); // 1
 
