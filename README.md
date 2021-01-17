@@ -57,7 +57,7 @@
 
 **HashSet** 这个需要使用`equals()`还有`hashCode`两个方法。因为Set是不能重复的，那怎么确定是否重复呢。首先就要看的是hash值是否重复，其次看完hash值之后还要看equals是否重复。如果在第一步hash值就已经不是重复的情况下就无需对比equals了，这比几千个几万个使用equals进行对比遍历的方法更为高效。
 
-**TreeSet** 最特殊的 因为使用的是这个数的结构。所以要求很多，比如元素的数据类型必须是一致的。且对比是否相等的方法使用的是自然排序 *Comparable* 和 自定义排序*Comparator* 
+**TreeSet** 最特殊的 因为使用的是这个数的结构。所以要求很多，比如元素的<u>数据类型必须是一致</u>的。且对比是否相等的方法使用的是自然排序 *Comparable* 和 自定义排序*Comparator* 
 
 ```java
 Set ts = new TreeSet();
@@ -121,7 +121,7 @@ public TreeSet(Comparator<? super E> comparator) {
 | Set（HashSet） | *hashCode()* *equals()*                                | 最常用的就是HashSet            |
 | Set（TreeSet） | *Comparable* → `compareTo`  *Comparator* → `compare()` | 数据类型要一样，因为底层红黑树 |
 
-集合到数组
+**集合到数组**
 
 ```java
 public class Main {
@@ -140,7 +140,7 @@ public class Main {
 }
 ```
 
-**数组到集合**
+**数组到集合1**
 
 ```java
 public class Main {
@@ -155,7 +155,7 @@ public class Main {
 }
 ```
 
-**集合到数组**
+**数组到集合2**
 
 ```java
 public class Main {
@@ -164,8 +164,8 @@ public class Main {
         int[] arrB = {1 , 7, 9 , 2, 10};
         Collection collA = Arrays.asList(arrA);
         Collection collB = Arrays.asList(arrB);
-        System.out.println(collA.size()); // 5
-        System.out.println(collB.size()); // 1
+        System.out.println(collA.size()); // 5 
+        System.out.println(collB.size()); // 1 这里是1的原因是因为并没有自动拆箱。直接当Object算的
         
         Collection collString = Arrays.asList(new String[]{"String", "Array", "To", "Collection"});
         Iterator ite = collString.iterator();
@@ -177,5 +177,150 @@ public class Main {
 
 ```
 
+**过滤一组数组中重复的值**
+
+```java
+public class Main {
+    public static void main(String[] args) throws Exception {
+        List list = new ArrayList();
+        list.add(new Integer(1));
+        list.add(new Integer(1));
+        list.add(new Integer(2));
+        list.add(new Integer(2));
+        list.add(new Integer(3));
+        List list2 = duplicateList(list);
+        // 循环方法1
+        Iterator ite = list2.iterator();
+        while(ite.hasNext()){
+            System.out.println(ite.next());
+        }
+        // 循环方法2
+      	for (Object i : list2 ){
+            System.out.println(i);
+        }
+    
+    }
+    
+    public static List duplicateList(List list) {
+      	// 新建一个空HashSet（因为Set不能有重复值 就用这个）
+        HashSet hset = new HashSet();
+        // 这个时候list已经过滤过然后给了hset
+        hset.addAll(list);
+      	// 返回一个过滤过后的list
+        return new ArrayList(hset);
+    }
+}
+
+```
+
+**关于Set删除的一个点**
+
+要明白HashSet 永远是先hashCode 然后在equals
+
+```java
+HashSet set = new HashSet();
+Person p1 = new Person(1001, "AA");
+Person p2 = new Person(1002, "BB");
+
+set.add(p1);
+set.add(p2);
+System.out.println(set); // 肯定是AA BB 都包含
+
+p1.name = "CC";
+set.remove(p1);
+System.out.println(set);// 这时候发现结果是BB CC 因为还是按照p1(CC)来判断的 当时添加的时候根本没有 所以没能remove成功
+
+set.add(new Person(1001, "CC"));
+System.out.println(set); // BB CC CC 这里是因为new的时候也是按照1001 CC来判断的，那个位置啥都没有 肯定添加成功
+
+set.add(new Person(1001, "AA"));
+System.out.println(set); // BB CC CC AA 这个时候因为判断的是1001 AA hashCode是过去了。但是在equals的时候发现是CC（↑改过了） 所以这个也能添加成功
+```
+
 ### Map
+
+三个孩子
+
+- HashMap 最常用的键值对 可以存储null
+  - LinkedHashMap 对比上面多加了链表
+- TreeMap 键值对的树 （和上面TreeSet很像 自带排序）
+- Hashtable 古老的实现方式 不能使用null 线程安全 
+  - Properties 常用来处理配置文件 key和value都是String类型
+
+HashMap的key很像Set value很像Collection
+
+```
+1 Map中的key:无序的、不可重复的，使用Set存储所有的key  
+          ---> key 所在的类要重写 equals()和 hashCode() （以HashMap为例）
+2 Map中的value:无序的、可重复的，使用 Collection 存储所有的value 
+          ---> value 所在的类要重写 equals() 为什么不用重写hashCode 因为判断的时候可以通过key直接找到，也没必要统一成一样的value
+3 一个键值对：key-value构成了一个Entry对象。Map中的 entry:无序的、不可重复的，使用Set存储所有的entry （Key都不重复了，entry整体肯定不可能重复啊）
+```
+
+**遍历所有key**
+
+```java
+Map<Integer, String> map = new HashMap<Integer, String>();
+map.put(1, "123");
+map.put(2, "456");
+map.put(3, "789");
+Set set = map.keySet();
+Iterator ite = set.iterator();
+while(ite.hasNext()){
+	System.out.println(ite.next());
+}
+```
+
+**遍历所有的value**
+
+```java
+Map<Integer, String> map = new HashMap<Integer, String>();
+map.put(1, "123");
+map.put(2, "456");
+map.put(3, "789");
+Collection<String> values = map.values();
+for (String s : values){
+	System.out.println(s);
+} 
+```
+
+**遍历所有的k-v**
+
+方法1
+
+```java
+Map<Integer, String> map = new HashMap<Integer, String>();
+map.put(1, "123");
+map.put(2, "456");
+map.put(3, "789");
+Set<Entry<Integer, String>> entrySet = map.entrySet();
+Iterator<Entry<Integer, String>> ite = entrySet.iterator();
+while(ite.hasNext()){
+  Entry<Integer, String> entry = ite.next();
+  System.out.println(entry.getKey() + " : " + entry.getValue());
+}
+```
+
+方法2
+
+```java
+Map<Integer, String> map = new HashMap<Integer, String>();
+map.put(1, "123");
+map.put(2, "456");
+map.put(3, "789");
+Set<Integer> set =  map.keySet();
+Iterator ite = set.iterator();
+while(ite.hasNext()){
+  // 拿到key
+	Object key = ite.next();
+  String value = map.get(key);
+  System.out.println(key + "==" + value);
+}
+```
+
+**关于 Collection PK Collections**
+
+一言以蔽之。Collection是一个**集合数据类型**的接口。Collections 是一个**工具**接口。里面好多静态方法可以服务于其他数据类型。
+
+具体看这个 [JAVA中Collection和Collections的区别](https://www.cnblogs.com/shikamaru/p/8926311.html)
 
