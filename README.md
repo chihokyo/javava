@@ -324,3 +324,651 @@ while(ite.hasNext()){
 
 具体看这个 [JAVA中Collection和Collections的区别](https://www.cnblogs.com/shikamaru/p/8926311.html)
 
+## 面向对象
+
+### 1. 继承
+
+子类继承父类。子类就继承了父类所有的属性和方法。虽然private不可以直接获取，但可以通过父类里面其他方法调用。
+
+其实子类已经获取了父类的结构，但是因为封装性的影响，并不能直接调用。
+
+```java
+private String name;
+public String getName(){
+  return this.name
+}
+// 比如子类不可以直接.name
+// 但是可以调用父类的getName方法照样可以获取父类的name
+```
+
+#### **关于重写**
+
+<u>方法名</u>和<u>形参列表</u>需要一样。【理解成覆盖比较好容易理解】
+
+父类的private不能重写。比如。↓
+
+```java
+// 父类写
+private void show(){
+  System.out.println("p show");
+}
+// 子类写 这个时候是可以调用并且成功的，因为这样只是把它当做子类的方法。而不会当做成重写
+public void show(){
+  System.out.println("c show");
+}
+// NG 这样就不行，指名了是重写覆盖。肯定会出错。
+@Override
+public void shwoshow
+  System.out.println("c show");
+}
+
+```
+
+#### 返回值类型
+
+| 父类                   | 子类                                                         |      |
+| ---------------------- | ------------------------------------------------------------ | ---- |
+| void                   | void                                                         |      |
+| A类                    | A类or A类的子类                                              |      |
+| 基本数据类型（double） | 必须是相同的（double）不能写int，不能自动类型提升 return (double)int 这样可以 |      |
+
+```java
+// 父类
+public Object info(){
+  return null;
+}
+// 子类
+public String info(){
+  return "c String"
+}
+```
+
+异常类型 和 返回值类型一样。绝对不能。大于父类。比如父：Exception。子可以RuntimeException。
+
+**static 方法不可以被重写。** static根本不能叫重写。因为随着类加载而加载。
+
+#### **子类如何调用已经重写父类的方法？**
+
+*super()*
+
+```java
+class Person {
+    String name;
+    int age;
+    public Person () {
+        
+    }
+
+    public Person (String name, int age){
+        this.name = name;
+        this.age = age;
+    }
+    public void eat() {
+        System.out.println("Person eat");
+    }
+
+    public void walk(int distance) {
+        System.out.println("Person walk : " + distance);
+    }
+}
+
+class Student extends Person {
+    String major;
+    public Student () {
+        
+    }
+    
+    public void eat() {
+        super.eat(); // 这里调用父类
+        System.out.println("Student eat");
+    }
+    
+    public Student (String major){
+        this.major = major;
+    }
+    public void study() {
+        System.out.println("Student study: " + major);
+    }
+}
+
+
+```
+
+super可以调用在某些情况下和this可能会冲突 属性和方法不同。
+
+属性不会存在覆盖这一说。也就是说此时内存里既有父类的属性也有子类的属性。2者都会存在。
+
+```java
+class Person {
+    String name;
+    int age;
+  	int id;
+
+ class Student extends Person {
+    int id;
+ 
+  public void show(){
+    // 因为子类和父类并没有冲突。所以这个时候这俩是一样的this还有super
+    // this的时候会优先在自己的范围内查找，没有就去找super。而super就是直接去找
+    System.out.println("name = " + this.name + ", age = " + super.age);
+    // 这个就出问题了 id既然子父类都有，那么使用什么都要用this or super指名
+    System.out.println("id = " + id);
+  }
+```
+
+证明一下上面的东西
+
+```java
+public class Main {
+    public static void main(String[] args) throws Exception {
+        Student s = new Student("Programing");
+        s.show();
+    }
+}
+
+class Person {
+    String name;
+    int age;
+    int id = 1001;
+    public Person () {
+    }
+    public Person (String name, int age){
+        this.name = name;
+        this.age = age;
+    }
+}
+
+class Student extends Person {
+    String major;
+    int id = 1002;
+    public Student () {
+        
+    }
+
+    public Student (String major){
+        this.major = major;
+    }
+    
+    public void show() {
+        System.out.println("name = " + this.name + ", age = " + super.age);
+        // System.out.println("id = " + super.id); // 1001
+        // System.out.println("id = " + this.id); // 1002
+        System.out.println("id = " + id); // 1002 默认1002 也就是自己的
+    }
+}
+```
+
+> 结论就是。可以在子类的方法或者构造器中。通过super属性super方法来调用父类中声明的属性or方法。但是通常情况下会省略super。
+>
+> 特殊情况。在子类和父类属性不幸重名的情况下。想要在子类调用父类的属性or方法的时候，必须显示的使用super属性方式。
+>
+> 特殊情况。上面的在方法的情况下。如果父类没有super会一层层向上找，直到找到有父类super的情况
+>
+> super 关键字
+>       1 super 理解为父类
+>       2 super 可以用来调用：属性，方法，构造器
+>       3 super 怎么用呢 
+>              **3-1【关于属性】** 子父类拥有相同的属性 this默认为当前对象,需要调用父类的 super关键字
+>              如果在自己的没找到，本身找不到就会想前找。这样就会层层的向上找 this往往都会省略掉
+>              name 和 this.name 区别就是 第一个会在自己找不到的情况下想前层层去找。但是this.name直接就用自己的了
+>              **3-2 【关于方法】**也是一样的，同理。当子类和父类方法相同的时候，需要显式的进行super调用父类的方法，否则就会默认
+>                    使用子类的方法。
+>              **3-3【关于构造器】**
+>                    1 可以在子类的构造器中进行显示的用 super 调用父类构造器
+>                    2 super（形参列表） 必须声明在子类构造器的**首行**
+>                    3 按照构造器的原理，所以this(),super() 只能2选1 不能同时出现
+>                    4 有时候写子类的构造器 默认 IDE就设置了一个super 父类的空参构造器
+>                    5 父类没有空参构造器的时候，子类调用有时候可能会出错
+>                    6 在多个构造器中，至少有一个类的构造器中使用了super(形参列表)调用了父类的构造器
+
+**super 调用构造器**
+
+在没有显示写this or super构造器的时候，系统默认给了super() ,如果父类没有空参构造器的时候。
+
+子类也没有显示写出来this or super 就会报错的原理就在这里。
+
+```java
+class Person {
+    String name;
+    int age;
+    public Person () {
+    }
+
+    public Person (String name, int age){
+        this.name = name;
+        this.age = age;
+    }
+}
+
+class Student extends Person {
+    String major;
+    public Student () {
+        
+    }
+  	public Student (String major) {
+      	super(); // 在没有this or super的情况下其实默认省略了super
+        this.major = major;
+    }
+
+    public Student (String name, int age, String major){
+        super(name, age); // 这里显式的调用了super↑前提是父类必须要有
+        this.major = major;
+    }
+    public String toString(){
+        
+    }
+}
+```
+
+#### **为什么super和this调用语句不能同时出现？**
+
+因为都要在首行。
+
+#### **为什么super or this 调用语句只能在首行？**
+
+无论什么构造器创建子类对象，都需要初始化父类。因为需要继承父类的方法和属性，因此子类必须先初始化父类。
+
+#### **子类实例化的过程是什么？**
+
+子类对象实例化的全过程
+  从结果上看 继承性
+      子类继承父类之后，就获取了父类中声明的【属性或方法】
+      创建子类的对象，在堆空间中，就会加载**所有**父类中声明的属性（全部的父类，无论直接间接。）
+
+  从过程上看
+      当我们通过子类的构造器创造子类对象时，一定会直接or间接的调用父类的构造器,层层递进。
+      直接调用了java.lang.Object类中空参构造器位置。
+      正因为加载过所有的父类结构，所以才可以看见内存中有父类的结构。子类才能进行调用。
+      虽然说这么多，但自始至终其实只有一个对象。就是 new 出来的 ，不包括父类其他的对象的。
+      因为父类并没有new，更没有父类对象的地址
+
+个人理解，就是继承相当于把所有父类吸收到自己的【模子】里。new的时候啥都有。
+
+### 2. 多态性
+
+#### **对象多态性是什么？**
+
+父类的引用指向子类的对象。`Person p = new Man();` 
+
+#### **虚拟方法「Virtual Method Invocation」调用是什么？**
+
+当调用父类同名同参数的方法时，实际执行的是子类重写的父类方法。
+
+子类定义了和父类同名同参数的方法，在多态的情况下。此时的父类就是虚拟方法。父类根据不同的子类对象。动态调用属于该子类的方法。这个方法在编译器是无法确定的，【动态绑定】也就是说多态是一个运行时行为，只有运行的时候才能确定
+
+```java
+public class Main {
+    public static void main(String[] args) throws Exception {
+        Person p = new Man();
+        p.eat();
+        p.walk();
+    }
+}
+
+class Person {
+    String name;
+    int age;
+    int id = 100;
+    public void eat() {
+        System.out.println("Person eat");
+    }
+    public void walk() {
+        System.out.println("Person walk");
+    }
+}
+
+class Man extends Person {
+    boolean isSmoking;
+    int id = 200;
+
+    public void fight() {
+        System.out.println("Man can fight");
+    }
+    @Override
+    public void eat() {
+        System.out.println("Man eat more");
+    }
+    @Override
+    public void walk() {
+        System.out.println("Man walk slow");
+    }
+}
+
+class Woman extends Person {
+    boolean isCute;
+
+    public void beBeauty() {
+        System.out.println("Woman Beauty Girl");
+    }
+    @Override
+    public void eat() {
+        System.out.println("Woman eat good");
+    }
+    @Override
+    public void walk() {
+        System.out.println("Woman walk fast");
+    }
+}
+```
+
+#### **验证一下编译时行为还是运行时行为？**
+
+一言以蔽之，就是在你读代码的时候其实你根本不知道到底执行的是什么对象。编译的时候无法确定。真正执行起来的时候就可以确定了。
+
+```java
+public class Main {
+    public static void main(String[] args) throws Exception {
+      // 生成一个随机数
+        int key = new Random().nextInt(3);
+        System.out.println(key);
+      // 根据随机数生成对应的对象
+        Animal animal = getInstance(key);
+        animal.eat();
+    }
+   
+    public static Animal getInstance(int key) {
+        switch(key) {
+            case 0:
+                return new Cat();
+            case 1:
+                return new Dog();
+            default:
+                return new Sheep();
+        }
+    }
+}
+
+class Animal{
+
+    public void eat() {
+        System.out.println("Animal eat");
+    }
+}
+
+class Dog extends Animal{
+    @Override
+    public void eat() {
+        System.out.println("Dog eat bones");
+    }
+}
+
+class Cat extends Animal{
+    @Override
+    public void eat() {
+        System.out.println("Cat eat Fish");
+    }
+}
+class Sheep extends Animal{
+    @Override
+    public void eat() {
+        System.out.println("Sheep eat Fish");
+    }
+}
+```
+
+重载的话，在编译的时候就已经确定了要调用什么方法。就是**静态绑定。**
+
+而多态必须在调用的那一刻才知道具体调用的数值，所以是**动态绑定。** 如果不是动态绑定就不是多态。！！
+
+#### **那么可以调用父类里没有的方法吗？**
+
+NO。编译的时候看的是左边，声明的什么类型就是什么类型。
+
+`Person p = new Man();`
+
+左边 编译的时候看Person p 所以Person没有的方法根本不能用
+
+右边 执行的时候但用的是左边。
+
+#### **多态的前提是什么？**
+
+- 有继承关系（子父类等等）
+- 要有方法的重写。（子类基本都会重写，如果没有重写，那直接子类不就得了。）
+
+#### **为什么要使用多态？**
+
+省略多个重载方法。比如equals(Object obj) 如果没有多态。那么每一次调用equals难道都要new一个Object吗
+
+```java
+public class Main {
+    public static void main(String[] args) throws Exception {
+        Main ani = new Main();
+        ani.func(new Dog());
+        ani.func(new Cat());
+    }
+    // 1 有多态的情况下，可以直接把new Dog就这么当参数传给func
+    public void func(Animal animal) { // Animal animal = new Dog();
+        animal.eat();
+        animal.wow();
+    }
+    // 2 没有有多态的情况下 就要像下面一样写
+    
+    public void func(Dog dog) {
+        dog.eat();
+        dog.wow();
+    }
+    public void func(Cat cat) {
+        cat.eat();
+        cat.wow();
+    }
+    // ... 也就说声明什么类型的，就只能new这个类型对象了 不然要重载写多少遍啊。。
+}
+
+class Animal{
+
+    public void eat() {
+        System.out.println("Animal eat");
+    }
+
+    public void wow() {
+        System.out.println("Animal wow");
+    }
+}
+
+class Dog extends Animal{
+    @Override
+    public void eat() {
+        System.out.println("Dog eat bones");
+    }
+    @Override
+    public void wow() {
+        System.out.println("Dog wangwang");
+    }
+}
+
+class Cat extends Animal{
+    @Override
+    public void eat() {
+        System.out.println("Cat eat Fish");
+    }
+    @Override
+    public void wow() {
+        System.out.println("Cat miaomiao");
+    }
+}
+```
+
+或者比如多个数据库
+
+```java
+public void doData(Connection con) { // con = new MySQLConnection();
+        // 规范的步骤操作数据 
+        // 无论什么数据库（Sql,mysql sqlite）进入到这里面都一样
+        // 这样就在父类定义了3个步骤,真正的连接都可以
+        // 这样子类就一定会重写。真正使用起来的时候，你只要把你的子类的方法进行重写就可以了
+        // 类似于这样
+        // con = new MySQLConnection();
+        // con = new OracleConnection();
+        con.method1(); // 这里就是调用的子类的方法了
+        con.method2();
+        con.method3();
+    }
+} 
+```
+
+#### **多态性在属性的体现呢？**
+
+和方法不同。对象的多态性<u>只适用于方法，不适用于属性</u>。属性不存在多态性。所以Person p = new Man();
+
+类型是谁就用谁的属性 编译运行都要看左边
+
+```java
+class Person {
+  int id = 1;
+}
+class Man extend {
+  int id = 2;
+}
+Person p = new Man();
+System.out.prinln(p.id); // 1
+```
+
+#### **多态如何调用子类特有的方法？**
+
+有了多态之后，内存中实际加载了子类的方法和属性。由于变量类型是父类类型，导致编译只能识别父类的方法。
+
+答案：强行转换。
+
+```java
+Person p = new Man();
+Man m1 = (Man) p; // 强制转换类型
+```
+
+基本类型
+
+- 强制类型转换 double → `(double)int`
+- 自动类型提升 int → double
+
+引用数据类型**(前提必须要有关系（继承，实现啥的）)**
+
+- 向上走 多态 `Person p = new Man();`
+- 向下走 使用`instanceof()`判断后强制类型转换 `Man m1 = (Man)p`
+
+测试一下走起。
+
+```java
+public class Main {
+    public static void main(String[] args) throws Exception {
+        Animal animal = new Dog();
+        Dog d = (Dog) animal;
+        System.out.println(d.id);
+    }
+}
+
+class Animal{
+    String name;
+    public void eat() {
+        System.out.println("Animal eat");
+    }
+}
+
+class Dog extends Animal{
+    int id = 12;
+    @Override
+    public void eat() {
+        System.out.println("Dog eat bones");
+    }
+}
+```
+
+为什么可以了呢。其实在打印的时候就可以发现。实际上在内存里都是存在的。类型@地址。有一个类型的限制。所以是找不到的，但是强转之后，类型发生了变化，就是可以找到了
+
+#### **如何避免强转风险呢？**
+
+为了避免在向下转型的时候 ClassCastException的异常。可以在向下转型执行，进行判断。
+
+之前先进行关键字 instanceof 判断 注意这是关键字
+
+a instanceof A 判断a是否是A的实例 如果是true 否则 false
+
+```java
+ public static void main(String[] args) throws Exception {
+        Animal animal = new Dog();
+        if(animal instanceof Dog ) {
+            Dog d = (Dog) animal;
+            System.out.println("!!!");
+            System.out.println(d.id);
+        }
+    }
+```
+
+```
+如果 
+a instanceof A  是true 
+a instanceof B  是true
+那么B就是A的父类。【B一定要大于A】
+a instanceof Object  永恒true
+```
+
+```java
+Person p = new Person();
+Man m = (Man)p; //肯定错啊，这俩根本没关系。上面new的是Person
+
+Object obj =  new Woman();
+Person p = (Person)obj; // 可以的 先向上提升之后，在强转向下。
+
+Man m = new Woman(); // NG 这俩根本没关系，平级
+```
+
+多态的属性or方法的终极练习
+
+```java
+public class Main {
+    public static void main(String[] args) throws Exception {
+        Sub s = new Sub(); // 不是多态 
+        System.out.println(s.count);// 20
+        s.display();// 20
+        
+        Base b = s;
+        System.out.println(b == s); // 这里是引用数据类型== 判断地址 地址已经在前面赋值过去了 true
+        System.out.println(b.count);// 这里判断属性，属性是看左边。Base的 于是 10 
+        b.display();// 这里是方法 方法已经重写覆盖 20
+    }
+   
+}
+
+class Base {
+    int count = 10;
+    public void display() {
+        System.out.println(this.count);
+    }
+}
+
+class Sub extends Base{
+    int count = 20;
+    public void display() {
+        System.out.println(this.count);
+    }
+}
+```
+
+再来一道练习题
+
+```java
+public class Main {
+    public static void main(String[] args) throws Exception {
+        Base b = new Sub();
+        b.add(1, 2, 3); // sub int[] arr
+        
+        Sub s = (Sub)b;
+        s.add(1, 2, 3); // sub int a,b,c
+    }
+}
+
+class Base {
+    public void add(int a, int... arr) {
+        System.out.println("base");
+    }
+}
+
+class Sub extends Base {
+    public void add(int a, int[] arr) {
+        System.out.println("sub int[] arr");
+    }
+    // 这个不是重写
+    public void add(int a, int b, int c) {
+        System.out.println("sub int a,b,c");
+    }
+}
+```
+
