@@ -326,7 +326,7 @@ while(ite.hasNext()){
 
 ## 面向对象
 
-### 1. 继承
+### 1. **继承**
 
 子类继承父类。子类就继承了父类所有的属性和方法。虽然private不可以直接获取，但可以通过父类里面其他方法调用。
 
@@ -341,7 +341,7 @@ public String getName(){
 // 但是可以调用父类的getName方法照样可以获取父类的name
 ```
 
-#### **关于重写**
+#### 关于重写
 
 <u>方法名</u>和<u>形参列表</u>需要一样。【理解成覆盖比较好容易理解】
 
@@ -387,7 +387,7 @@ public String info(){
 
 **static 方法不可以被重写。** static根本不能叫重写。因为随着类加载而加载。
 
-#### **子类如何调用已经重写父类的方法？**
+#### 子类如何调用已经重写父类的方法？
 
 *super()*
 
@@ -447,7 +447,7 @@ class Person {
  class Student extends Person {
     int id;
  
-  public void show(){
+  pubßlic void show(){
     // 因为子类和父类并没有冲突。所以这个时候这俩是一样的this还有super
     // this的时候会优先在自己的范围内查找，没有就去找super。而super就是直接去找
     System.out.println("name = " + this.name + ", age = " + super.age);
@@ -560,15 +560,15 @@ class Student extends Person {
 }
 ```
 
-#### **为什么super和this调用语句不能同时出现？**
+#### 为什么super和this调用语句不能同时出现？
 
 因为都要在首行。
 
-#### **为什么super or this 调用语句只能在首行？**
+#### 为什么super or this 调用语句只能在首行？
 
 无论什么构造器创建子类对象，都需要初始化父类。因为需要继承父类的方法和属性，因此子类必须先初始化父类。
 
-#### **子类实例化的过程是什么？**
+#### 子类实例化的过程是什么？
 
 子类对象实例化的全过程
   从结果上看 继承性
@@ -586,11 +586,11 @@ class Student extends Person {
 
 ### 2. 多态性
 
-#### **对象多态性是什么？**
+#### 对象多态性是什么？
 
 父类的引用指向子类的对象。`Person p = new Man();` 
 
-#### **虚拟方法「Virtual Method Invocation」调用是什么？**
+#### 虚拟方法「Virtual Method Invocation」调用是什么？
 
 当调用父类同名同参数的方法时，实际执行的是子类重写的父类方法。
 
@@ -651,7 +651,7 @@ class Woman extends Person {
 }
 ```
 
-#### **验证一下编译时行为还是运行时行为？**
+#### 验证一下编译时行为还是运行时行为？
 
 一言以蔽之，就是在你读代码的时候其实你根本不知道到底执行的是什么对象。编译的时候无法确定。真正执行起来的时候就可以确定了。
 
@@ -710,7 +710,7 @@ class Sheep extends Animal{
 
 而多态必须在调用的那一刻才知道具体调用的数值，所以是**动态绑定。** 如果不是动态绑定就不是多态。！！
 
-#### **那么可以调用父类里没有的方法吗？**
+#### 那么可以调用父类里没有的方法吗？
 
 NO。编译的时候看的是左边，声明的什么类型就是什么类型。
 
@@ -720,12 +720,12 @@ NO。编译的时候看的是左边，声明的什么类型就是什么类型。
 
 右边 执行的时候但用的是左边。
 
-#### **多态的前提是什么？**
+#### 多态的前提是什么？
 
 - 有继承关系（子父类等等）
 - 要有方法的重写。（子类基本都会重写，如果没有重写，那直接子类不就得了。）
 
-#### **为什么要使用多态？**
+#### 为什么要使用多态？
 
 省略多个重载方法。比如equals(Object obj) 如果没有多态。那么每一次调用equals难道都要new一个Object吗
 
@@ -806,7 +806,7 @@ public void doData(Connection con) { // con = new MySQLConnection();
 } 
 ```
 
-#### **多态性在属性的体现呢？**
+#### 多态性在属性的体现呢？
 
 和方法不同。对象的多态性<u>只适用于方法，不适用于属性</u>。属性不存在多态性。所以Person p = new Man();
 
@@ -823,7 +823,7 @@ Person p = new Man();
 System.out.prinln(p.id); // 1
 ```
 
-#### **多态如何调用子类特有的方法？**
+#### 多态如何调用子类特有的方法？
 
 有了多态之后，内存中实际加载了子类的方法和属性。由于变量类型是父类类型，导致编译只能识别父类的方法。
 
@@ -873,7 +873,7 @@ class Dog extends Animal{
 
 为什么可以了呢。其实在打印的时候就可以发现。实际上在内存里都是存在的。类型@地址。有一个类型的限制。所以是找不到的，但是强转之后，类型发生了变化，就是可以找到了
 
-#### **如何避免强转风险呢？**
+#### 如何避免强转风险呢？
 
 为了避免在向下转型的时候 ClassCastException的异常。可以在向下转型执行，进行判断。
 
@@ -971,4 +971,306 @@ class Sub extends Base {
     }
 }
 ```
+
+### 3. Object类
+
+无属性
+
+1个空参构造器
+
+一堆方法
+
+```java
+public class Main {
+    public static void main(String[] args) throws Exception {
+        Base b = new Base();
+        System.out.println(b.getClass()); // class Base
+        System.out.println(b.getClass().getSuperclass()); // class java.lang.Object
+    }
+}
+```
+
+| Modifier and Type  | Method                                | Description                                                  |
+| :----------------- | :------------------------------------ | :----------------------------------------------------------- |
+| `protected Object` | `clone()`                             | Creates and returns a copy of this object.                   |
+| `boolean`          | `equals(Object obj)`                  | Indicates whether some other object is "equal to" this one.  |
+| `protected void`   | `finalize()`                          | **Deprecated.**The finalization mechanism is inherently problematic. |
+| `Class<?>`         | `getClass()`                          | Returns the runtime class of this `Object`.                  |
+| `int`              | `hashCode()`                          | Returns a hash code value for the object.                    |
+| `void`             | `notify()`                            | Wakes up a single thread that is waiting on this object's monitor. |
+| `void`             | `notifyAll()`                         | Wakes up all threads that are waiting on this object's monitor. |
+| `String`           | `toString()`                          | Returns a string representation of the object.               |
+| `void`             | `wait()`                              | Causes the current thread to wait until it is awakened, typically by being *notified* or *interrupted*. |
+| `void`             | `wait(long timeoutMillis)`            | Causes the current thread to wait until it is awakened, typically by being *notified* or *interrupted*, or until a certain amount of real time has elapsed. |
+| `void`             | `wait(long timeoutMillis, int nanos)` | Causes the current thread to wait until it is awakened, typically by being *notified* or *interrupted*, or until a certain amount of real time has elapsed. |
+
+#### == PK equals()
+
+```java
+public static void main(String[] args) throws Exception {
+        int i = 10;
+        int j = 10;
+        double d = 10.0;
+        char c = 10;
+        System.out.println(i == j); // true 虽然有类型提升，但是比较的还是数值
+        System.out.println(i == d); // true
+        System.out.println(i == c); // true
+        
+        char c1 = 'A';
+        char c2 = 65;
+        System.out.println(c1 == c2); // true
+}
+```
+
+| 数据类型     | ==       | equals()                                                     |
+| ------------ | -------- | ------------------------------------------------------------ |
+| 基本数据类型 | 比较数值 | 因为是方法，不能使用基本类型。【除非包装类】                 |
+| 引用数据类型 | 比较地址 | 没重写。和== 一样。默认用父类【Object 比地址】<br />重写。看怎么重写的。基本上是内容。 |
+
+#### 如何重写equals()?
+
+基本上用的方法都是自动生成。
+
+先判断类型 后判断是否相等（这个相等基本数据类型用== 引用数据类型`equals()`）
+
+```java
+public boolean equals(Object obj) {
+    // 地址都一样了，那肯定一样。
+		if(this == obj) {
+      return true;
+    }
+   // 判断类型
+  if(obj instanceof Order ){
+    Order order = (Order)obj;
+    // OK
+    return this.orderId == order.orderId && this.orderName.equals(order.orderName);
+    // NG
+    return this.orderId == order.orderId && this.orderName == order.orderName;
+  }
+}
+```
+
+#### `toString()`是干嘛的？
+
+-  **Object 类的 toString 方法返回一个字符串，该字符串由类名（对象是该类的一个实例）、at 标记符“@”和此对象哈希码的无符号十六进制表示组成**。
+
+  源码 
+
+  ```java
+  
+  public String toString() {
+          return getClass().getName() + "@" + Integer.toHexString(hashCode());
+  }
+  ```
+
+  - 在String与其他数据类型进行连接的时候自动调用`toString()`方法
+  - 重写`toString()`方法比较好
+  - 基本类型数据转换为String类型的时候，调用了包装类的`toString()`方法
+
+```java
+Date now = new Date();
+        System.out.println("Now: " + now);
+        System.out.println("Now: " + now.toString()); // 上下一样
+        
+        String s1 = "Hello";
+        System.out.println(s1); // Hello
+        
+        int i1 = 199;
+        System.out.println(i1); // 199
+}
+```
+
+#### 如何重写toString？
+
+虽然系统能自动给。基本上就是我这样的写法。
+
+```java
+public String toString() {
+        return "{" +
+            " id='" + getId() + "'" +
+            ", balance='" + getBalance() + "'" +
+            ", annualInterestRate='" + getAnnualInterestRate() + "'" +
+            "}";
+}
+```
+
+### 4. 包装类
+
+#### **为什么要有包装类？**
+
+因为普通的基本数据类型不能使用Java面向对象里类高大上的各种方法。不是类。怎么.?
+
+比如`equals(Object obj）` 这个方法里面只能进去Object
+
+| Primitive Data Type | Wrapper Class   |
+| ------------------- | --------------- |
+| char                | **Character{}** |
+| byte                | Byte{}          |
+| short               | Short{}         |
+| int                 | **Integer{}**   |
+| long                | Long{}          |
+| float               | Float{}         |
+| double              | Double{}        |
+| boolean             | Boolean{}       |
+
+所有数字的类都有一个父类*Number*。
+
+```
+java.lang.Object
+	java.lang.Number
+		java.lang.Integer
+// Number实现了接口
+All Implemented Interfaces:
+Serializable
+// Number主要的子类
+Direct Known Subclasses:
+AtomicInteger, AtomicLong, BigDecimal, BigInteger, Byte, Double, DoubleAccumulator, DoubleAdder, Float, Integer, Long, LongAccumulator, LongAdder, Short
+```
+
+看源码就知道包装类的本质，其实就是把基本数据类型作为属性进行封装了而已。
+
+#### 基本类型，包装类，String怎么互相转换啊？
+
+[Github一些代码](https://github.com/chihokyo/javava/commit/fa350087282c71fb942a564d09ea5df4b206460e)
+
+基本类型 → 包装类
+
+- `valueOf()`
+
+- 自动装箱 
+
+  ```java
+  ArrayList<Integer> integerArrayList = new ArrayList<>(); integerArrayList.add(1); // 只能放class 却放了1 1 不用转换成Integer
+  
+  int intP1 = 100;
+  Integer intP2 = intP1;
+  ```
+
+包装类 → 基本类型
+
+- `intValue()` `floatValue` ...xxxValue
+- 自动拆箱
+
+```java
+ArrayList<Integer> integerArrayList = new ArrayList<>(); integerArrayList.add(1);
+int i = integerArrayList.get(0); // int i 而不是Integer i
+
+Boolean boolObj2 = Boolean.valueOf(false);
+boolean bool2 = boolObj2;
+System.out.println(bool2); // false
+```
+
+基本类型 → String
+
+包装类 → String
+
+因为自动装箱和拆箱的原因，基本类型和包装类几乎都可以算作是一个整体了。
+
+所以一起来看
+
+```java
+// 方法1 连接运算 ”“
+Integer inteObj = Integer.valueOf(678);
+String inteStr = inteObj + "";
+System.out.println(inteStr); // 678
+// 方法2 valueOf
+Integer inteObj2 = Integer.valueOf(567);
+String inteStr2 = String.valueOf(inteObj2);
+System.out.println(inteStr2); // 567
+// 方法3 toString方法
+
+```
+
+String → 基本类型 
+
+`parseXXX(String)`
+
+```java
+public static void main(String[] args) throws Exception {
+        String s = "124";
+        int i = Integer.parseInt(s);
+        System.out.println(i + 1);
+}
+```
+
+ String→ 包装类
+
+#### 包装类这么好为什么还要转换成基本类型？
+
+因为还想搞一些低俗的加减乘除操作。
+
+```java
+public static void main(String[] args) throws Exception {
+        Integer intObj = Integer.valueOf(123);
+        int i1 = intObj.intValue();
+        System.out.println(i1 + 100); // 223
+}
+```
+
+#### 为什么要使用自动装箱boxing，拆箱unboxing ？
+
+为了怕麻烦。因为基本类型经常和包装类进行转换。同上↑
+
+#### 如何使用自动装箱呢？
+
+```java
+int num1 = 10;
+Integer num2 = num1; // 怎么可以直接赋值给一个类呢 自动装箱
+
+boolean b1 = true;
+Boolean b2 = b1; // 同理
+
+int num = 10;
+method(10);
+// 常理来说 10是无法直接当参数的 应当转换成Integer作为Object的子类
+// 但是自动装箱功能就无需转换了
+public void method(Object obj){
+	System.out.printIn(obj);
+}
+```
+
+#### 如何使用自动拆箱呢？
+
+```java
+int i1 = 16;
+Integer i2 = i1;
+System.out.println(i2.toString());
+```
+
+#### 包装类练习题
+
+```java
+// 1
+public static void main(String[] args) throws Exception {
+  			// 三元运算符需要类型一致，所以编译自动提升成了double
+        Object o1 = true ? new Integer(1) : new Double(2.0);
+        System.out.println(o1); // 1.0
+}
+// 2
+public static void main(String[] args) throws Exception {
+        Object o2;
+        if (true)
+            o2 = new Integer(1);
+        else
+            o2 = new Double(2.0);
+        System.out.println(o2); // 1
+}
+// 3
+public static void main(String[] args) throws Exception {
+        Integer i = new Integer(1);
+        Integer j = new Integer(1);
+        System.out.println(i == j); // false
+        
+        Integer m = 1;
+        Integer n = 1;
+        System.out.println(m == n); // true
+        // 因为有个Integer cache 缓存是 -128 -127 这个范围内提前加载到缓存
+        // 超过了就要new
+        Integer x = 128;
+        Integer y = 128;
+        System.out.println(x == y); // false
+}
+```
+
+
 
