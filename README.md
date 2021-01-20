@@ -1272,5 +1272,419 @@ public static void main(String[] args) throws Exception {
 }
 ```
 
+### static关键字
 
+可以用于 属性 方法 代码块 内部类
+
+直接优先加载到内存里，实例都是公用这一份。
+
+```java
+public class Main {
+    public static void main(String[] args) throws Exception {
+        
+        Animal a1 = new Animal();
+        Animal a2 = new Animal();
+        a1.name = "Cat";
+        a2.name = "Dog";
+        
+        a1.home = "China";
+        a2.home = "Japan";
+        
+        System.out.println(a1.name); // Cat
+        System.out.println(a2.name); // Dog
+        System.out.println(a1.home); // Japan
+        System.out.println(a2.home); // Japan
+	      System.out.println(Animal.home); // Japan
+    }
+}
+
+class Animal {
+    static String home;
+    String name;
+}
+```
+
+#### 静态变量的好处？
+
+直接调用，无需新建对象。比如 `Math.PI` 多用于工具类啥的。
+
+#### 静态方法是？
+
+理论上和上面的变量一样。独占一份空间。可以直接调用。但是要注意。
+
+static 只能调用 static的变量or方法。很简单啊。因为静态都是先于实例加载的，那肯定调用不到。比如。
+
+**静态方法 只能调用 静态方法 or 静态属性**
+
+**静态方法内不能使用this super**
+
+**静态结构，没有特别声明的，都是省略的类。`Class.field` or `Class.method()`**
+
+```java
+public class Main {
+    public static void main(String[] args) throws Exception {
+        // Animal.infoA(); NG
+        
+        Animal.infoB();
+    }
+}
+
+class Animal {
+    static String home;
+    String name;
+    // public static void infoA(){
+    //     // name 归对象所有 所以无法进行调用 方法本身就是错的
+    //     System.out.println("Name is " + name); NG
+    // }
+    public static void infoB(){
+        // name 归对象所有 所以无法进行调用
+        System.out.println("Home is " + home); // Home is null
+    }
+}
+```
+
+都可以从生命周期来考虑。类产生-类变量or类方法-对象产生-对象变量or方法-对象消亡-类消亡
+
+#### 开发中如何确定属性or方法是静态的？
+
+多个对象大家一起共享的一般是静态属性。
+
+如果操作静态属性的一般就是静态方法。
+
+或者是工具类的种种一般都是静态的。`Math,Arrays,Collection`
+
+#### 写一个简单的static应用（制造圆类）
+
+```java
+public class Main {
+    public static void main(String[] args) throws Exception {
+        Circle c1 = new Circle();
+        Circle c2 = new Circle();
+        Circle c3 = new Circle(2.1);
+
+        System.out.println("c1.id " + c1.getId());
+        System.out.println("c2.id " + c2.getId());
+        System.out.println("c3.id " + c3.getId());
+        System.out.println("现在总共有圆的个数是: " + Circle.getTotal());
+    }
+}
+
+class Circle {
+    private int id;
+    private double radius;
+    
+    private static int total;
+    private static int init = 1001; // static 所有对象共享的 去掉之后所有对象都是1001 那就是错的了
+    
+    public Circle () {
+        id = init++; // 自增之后多个对象共享 避免id重复
+        total++;
+    }
+    
+    public Circle (double radius) {
+        // 重写前
+        // id = init++;
+        // total++
+        // 重写后
+        this();
+        this.radius = radius;
+    }
+    
+    public double getRadius(){
+        return radius;
+    }
+    public int getId(){
+        return id;
+    }
+    public void setRadius(double radius){
+        this.radius = radius;
+    }
+    public void setId(int id){
+        this.id = id;
+    }
+    // 获取总数，这时候用static 是因为操作的属性也是static
+    public static int getTotal(){
+        return total;
+    }
+    
+}
+
+```
+
+#### 什么是单例模式？
+
+按照我现在的水平，我的理解就是一个类只能有一个实例对象。
+
+如何保证一个类只能有一个实例对象呢？
+
+翻译过来就是只能new一次之后不能在继续new
+
+- **构造器设置成private →外部无法new**
+- **外部无法new 内部必须要能new → 因为不new连一个对象都没有**
+- **要能用这个对象，虽然是独生子，但也是可以使用的。→ 提供公共方法来返回类对象。**
+
+```java
+public class Main {
+    public static void main(String[] args) throws Exception {
+      	Bank b1 = Bank.getinstance();
+				Bank b2 = Bank.getinstance();
+      
+    }
+}
+
+class Bank {
+  // 1 私有化类构造器
+  private Bank(){
+    
+  }
+  // 2 内部创建类的对象 这里已经创造好了 并且是私有的
+  private Bank instance = new Bank();
+  // 4 必须是静态的
+  private static Bank instance = new Bank();
+  // 3-A 提供公共的方法，返回类的对象A　※这里有瑕疵。
+  public Bank getInstance(){
+    return instance;
+  }
+  // 3-B 如果我想调用下面的getInstance()  会发现必须要 new 
+  // 但是下面给的属性已经new了。这里就不能new了。不能new怎么调用啊
+  // 于是就改成静态的就可以new了 ※这里依然有瑕疵。
+  public static Bank getInstance(){
+    return instance;
+  }
+  
+ // 3-C 瑕疵就在于instance不是static的 静态方法里怎可调用非static
+  	
+}
+```
+
+最后的结局就是 
+
+```java
+//
+public class Main {
+    public static void main(String[] args) throws Exception {
+        Bank b1 = Bank.getInstace();
+        Bank b2 = Bank.getInstace();
+        System.out.println(b1 == b2);
+    }  
+}
+
+class Bank {
+    private Bank(){
+    }
+    private static Bank instance = new Bank();
+    public static Bank getInstace(){
+        return instance;
+    }
+}
+```
+
+下面还有一个版本是不用提前就进行的
+
+```java
+public class Main {
+    public static void main(String[] args) throws Exception {
+        Bank b1 = Bank.getInstace();
+        Bank b2 = Bank.getInstace();
+        System.out.println(b1 == b2); //true 
+    }
+}
+
+class Bank {
+    private Bank(){
+    }
+  // 这种方式可以延迟对象的创建 无需加载 但此种方法非线程安全
+    private static Bank instance = null;
+    public static Bank getInstace(){
+        if(instance == null) {
+     				// 判断进入到这里之后 由于堵塞等原因 可能有多个判断都进入
+           // 生成了多个实例
+            instance = new Bank();
+        }
+        return instance;
+    }
+}
+```
+
+日网这里还有好多好多
+
+https://qiita.com/Munchkin/items/b7a90dd2c262e5ee0ada
+
+#### 为什么要用单例模式啊？
+
+为了减少系统性能开销。比如读取一些配置资源，其实一份就够了永久贮存在内存里就够了。没必要多份。
+
+#### 关于Main函数
+
+main也是静态方法 所以无法调用非静态属性pr方法
+
+也是入口函数
+
+### 代码块（初始化用）
+
+#### 代码块作用是什么？
+
+初始化类和对象
+
+#### 可以有修饰符吗？
+
+只能static 其他啥都不行
+
+#### 建议分开写吗？
+
+不建议。反正都要按照顺序执行。
+
+#### static和非static有区别吗？
+
+有 static 在类创建的时候进行加载。
+
+非static在对象创建的时候加载。
+
+#### 为什么要用代码块？
+
+主要是用于一些初始化操作。比如数据库连接和配置文件读取。
+
+顺便解决一个我内心的小问题。
+
+```java
+class Person {
+   int age;
+   age += 1;
+  // 像上面那种age+=1这种写法，其实是绝对NG的。
+  // 可以在函数内部做操作，但是在改写属性的地方是不能做一些操作的
+  // 比如在上面不仅仅写操作，还写代码块 if语句什么的，都是不可以的。
+  // 如何解决这个问题，就要使用代码块。
+  private Person(){
+    
+  }
+}
+```
+
+> 静态代码块
+> 	>内部可以有输出语句
+> 	>随着类的加载而执行,而且只执行一次
+> 	>作用：初始化类的信息
+> 	>如果一个类中定义了多个静态代码块，则按照声明的先后顺序执行
+> 	>静态代码块的执行要优先于非静态代码块的执行
+> 	>静态代码块内只能调用静态的属性、静态的方法，不能调用非静态的结构
+>
+> 非静态代码块
+> 	>内部可以有输出语句
+> 	>随着对象的创建而执行
+> 	>每创建一个对象，就执行一次非静态代码块
+> 	>作用：可以在创建对象时，对对象的属性等进行初始化
+> 	>如果一个类中定义了多个非静态代码块，则按照声明的先后顺序执行
+> 	>非静态代码块内可以调用静态的属性、静态的方法，或非静态的属性、非静态的方法
+
+#### 都可以赋值的情况下优先级是？
+
+静态块,main(),构造（非静态）块,构造方法。
+
+![](https://raw.githubusercontent.com/chihokyo/image_host/master/20210120223928.png)
+
+#### 关于父子构造器呢？
+
+![](https://raw.githubusercontent.com/chihokyo/image_host/master/20210120230850.png)
+
+### final 关键字
+
+| 修饰对象 |                      |                                             |
+| -------- | -------------------- | ------------------------------------------- |
+| Class    | 不能继承了【太监类】 | String System StringBuffer 都是不能被继承的 |
+| method   | 不能重写了           | Object类中的getClass()                      |
+
+关于变量的修饰 稍微麻烦点。
+
+属性 就是Field 意思就是写在Class里的那个
+
+**有final的地方一定要初始化赋值！！**
+
+```java
+class Person {
+  // 1 显示初始化 OK
+  final int AGE = 5;
+  // 2 默认初始化 NG 除非下面有构造器代码块初始化
+  final int AGE;
+  final String NAME; // 下面代码块赋值了
+  final int ID;
+  // 3 默认初始化
+  {
+    NAME = "Robot";
+  }
+  // 4 构造器 【如果多个重载构造器，每一个都要初始化赋值的 一个都不能少！】
+  public Person(){
+    ID = 99;
+  }
+  // 5 构造器 带参数
+  public Person(int id){
+    ID = id;
+  }
+}
+```
+
+#### 方法里为什么不能初始化final变量？
+
+常量的话，因为要在对象创造之前就要出生。但是方法是在对象之后出生的，不行。
+
+#### 有什么final赋值的小技巧吗？
+
+如果大家拥有的都是一样的数据，简单的不知。**就显示初始化。**
+
+如果赋值不是一个简简单单的值，而是一个方法 `ID=method()` 那么就建议在代码块里
+
+如果大家拥有的不一样，就可以带参数的构造器，例如上面的5。
+
+#### final可以修饰参数吗？
+
+```java
+public void show(final int num){
+  // 这里就是进去的常量
+  // 不能进一步进行操作
+  num += 10; // NG
+}
+```
+
+#### final可以修饰局部变量吗（方法内的变量）？
+
+可以的，只能用，不能修改赋值啥的。和上面的形参一样。
+
+```java
+public void show(final int num){
+  final int NUM = 10;
+}
+```
+
+final （属性 方法）+ static（属性 方法 代码块 内部类） = 可以修饰属性or方法
+
+修饰属性就是 === **全局常量**（接口常用）
+
+修饰方法 == 不能重写 不能继承
+
+#### final经典题目
+
+```java
+public int addOne(final int x){
+	return x++; // NG
+	return ++x; // NG 
+	return x + 1; // OK 没有改变x本身，只是加了
+}
+```
+
+```java
+public class Main {
+    public static void main(String[] args) throws Exception {
+        Other o = new Other();
+        new Main().addOne(o);
+    }
+    public void addOne(final Other o) {
+        // o = new Other(); // NG 
+        o.i++; // o是final不能修改 i又不是 OK的
+        System.out.println(o.i);
+    }
+}
+
+class Other {
+    public int i;
+}
+```
 
