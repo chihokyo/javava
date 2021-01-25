@@ -2768,3 +2768,360 @@ class AA {
 }
 ```
 
+### 枚举类
+
+- 类的对象有限 + 确定
+- 定义一组常量，使用枚举类。
+- 如果枚举类只有1个对象，因为还是常量。则就是单例模式实现方式了。
+- jdk5之后来的
+
+比如 周一到周日，性别，季节，订单状态。
+
+#### 如何定义枚举类？
+
+**1 jdk5之前 自定义枚举类**
+
+这里为什么要使用构造器来初始化的原因是因为，代码块还有显式赋值都是无法根据参数不同而定义的，是死的，而构造器可以根据参数不同而进行调整，是活的。
+
+```java
+public class Main {
+    public static void main(String[] args) throws Exception {
+        Season spring = Season.SPRING;
+        System.out.println(spring);
+    }
+}
+
+class Season {
+    // ① 声明Season对象的属性 使用 private final进行修饰 既不能被随意修改，也不能被继承。如果不是私有，那么外部就可以随便new 那就不是确定的了
+    private final String sName;
+    private final String sDesc;
+    // ② 私有化类的构造器，并给对象属性赋值。
+    private Season(String sName, String sDesc){
+        this.sName = sName;
+        this.sDesc = sDesc;
+    }
+    // ③ 提供当前枚举类的对个对象 public static final 不可以改，可以使用static直接调用
+    public static final Season SPRING = new Season("春", "春暖花开");
+    public static final Season SUMMER = new Season("夏", "夏日炎炎");
+    public static final Season AUTUMN = new Season("秋", "秋高气爽");
+    public static final Season WINTER = new Season("冬", "冰冷刺骨");
+    // ④ 其他诉求1 获取枚举类对象的属性（既然private不给获取，那就写方法进行获取）
+    public String getSName(){
+        return this.sName;
+    }
+    public String getSDesc(){
+        return this.sDesc;
+    }
+    @Override
+    public String toString() {
+        return "Season{" + "seasonName='" + sName + '\'' + ", seasonDesc='" + sDesc + '\'' + '}';
+    }
+    
+}
+```
+
+2 jdk5之后 使用关键字 **enum** 定义。
+
+这里直接输出无需重写toString的原因是因为 enum这个类是重写了。
+
+这里的Enum继承的不是 Object 类，继承的是 java.lang.Enum Enum的类
+
+而 toString方法是被重写了的 正常的 Object 类打印出来的是地址
+
+```java
+public class Main {
+    public static void main(String[] args) throws Exception {
+        Season spring = Season.SPRING;
+        System.out.println(spring);
+    }
+}
+
+enum Season {
+    
+    // 自定义的时候重复的代码提出掉，提供当前枚举类的对象。多个对象之间用,隔开，最后；
+    SPRING("春", "春暖花开"),
+    SUMMER("夏", "夏日炎炎"),
+    AUTUMN("秋", "秋高气爽"),
+    WINTER("冬", "冰冷刺骨");
+    
+    private final String sName;
+    private final String sDesc;
+    
+    private Season(String sName, String sDesc){
+        this.sName = sName;
+        this.sDesc = sDesc;
+    }
+    public String getSName(){
+        return this.sName;
+    }
+    public String getSDesc(){
+        return this.sDesc;
+    }
+  
+  	// 一般不去重写 public String toString() {}
+    
+}
+```
+
+一段超级简单的替换代码
+
+```java
+class Status {
+    private final String NAME;
+    private Status(String name) {
+        this.NAME = name;
+    }
+    public static final Status FREE = new Status("FREE");
+    public static final Status BUSY = new Status("BUSY");
+    public static final Status VOCATION = new Status("VOCATION");
+
+    public String getNAME(){
+        return NAME;
+    }
+    @Override
+    public String toString() {
+        return NAME;
+    }
+}
+
+// 替换之后
+
+enum Status {
+    FREE,
+    BUSY,
+    VOCATION
+}
+```
+
+#### 枚举类的常用方法是？
+
+要注意就是Enum 实现的枚举类可以使用下面的方法，非Enum实现的不可以实现。
+
+这篇文章可供参考 
+
+https://www.cnblogs.com/ziph/p/13068923.html
+
+| 返回值   | 方法                                    | 描述                                        |
+| :------- | :-------------------------------------- | :------------------------------------------ |
+| String   | name()                                  | 获取枚举成员的名称                          |
+| static T | valueOf(Class<T> enumType, String name) | 获取指定枚举成员名称和类型的枚举成员        |
+| String[] | values()                                | 获取枚举成员的所有值                        |
+| int      | compareTo(E o)                          | 比较此枚举与指定对象的顺序                  |
+| int      | hashCode()                              | 获取枚举成员的哈希值                        |
+| int      | ordinal()                               | 获取枚举成员的序数（第一个枚举成员位置为0） |
+| String   | toString()                              | 返回枚举成员名称                            |
+| Class<E> | getDeclaringClass()                     | 获取枚举成员的类对象                        |
+
+#### name和toString有什么区别？
+
+关于name方法和toString方法，其实很简单。name()就是根据枚举成员来获取该枚举成员的字符串名称。而同String方法也是用来获取枚举成员的字符串名称。虽然作用都是相同的，但是name方法是用final修饰的不能被重写，而toString是可以被重写的。
+
+```java
+public class Main {
+    public static void main(String[] args) throws Exception {
+        System.out.println(Season.SPRING.toString());
+        System.out.println(Season.SPRING.name());
+    }
+    
+    enum Season {
+        SPRING("春", "春暖花开"),
+        SUMMER("夏", "夏日炎炎"),
+        AUTUMN("秋", "秋高气爽"),
+        WINTER("冬", "冰冷刺骨");
+        private final String sName;
+        private final String sDesc;
+    
+        private Season(String sName, String sDesc) {
+            this.sName = sName;
+            this.sDesc = sDesc;
+        }
+        public String getSname(){
+            return this.sName;
+        }
+        public String getSdesc(){
+            return this.sDesc;
+        }
+        @Override
+        public String toString() {
+            return "Season{" + "seasonName='" + getSname() + '\'' + ", seasonDesc='" + getSdesc() + '\'' + '}';
+        }
+    }
+}
+```
+
+#### `valueOf()`用法是什么？
+
+此方法的作用是**传入一个字符串，然后将它转换成对应的枚举成员**。这里传入的字符串必须与定义的枚举成员的名称一致，严格区分大小写。如果传入的字符串并没有找到其对应的枚举成员对象，就会抛出 *java.lang.IllegalArgumentException* 异常
+
+```java
+public static void main(String[] args) throws Exception {
+        Season w = Season.valueOf("WINTER");
+        System.out.println(w); // Season{seasonName='冬', seasonDesc='冰冷刺骨'}
+        
+        Season s = Season.valueOf("SPR");
+        System.out.println(s); // java.lang.IllegalArgumentException 
+}
+```
+
+`ordinal()`用法
+
+方法是获取枚举类的序列数，意思就是初始是0，然后按照顺序。
+
+```java
+// 获取指定枚举成员的次序
+int i = Season.AUTUMN.ordinal();
+System.out.println(i); // 2
+// 获取所有成员的次序
+Season[] seasons = Season.values();
+        for (Season s: seasons){
+            System.out.println(s + " ->" + s.ordinal());
+}
+Season{seasonName='春', seasonDesc='春暖花开'} ->0
+Season{seasonName='夏', seasonDesc='夏日炎炎'} ->1
+Season{seasonName='秋', seasonDesc='秋高气爽'} ->2
+Season{seasonName='冬', seasonDesc='冰冷刺骨'} ->3
+```
+
+`compareTo()`
+
+**compareTo方法比较的是两个枚举成员的次序数，并返回次序相减后的结果。**
+
+```java
+// 源码
+public final int compareTo(E o) {
+        Enum<?> other = (Enum<?>)o;
+        Enum<E> self = this;
+        if (self.getClass() != other.getClass() && // optimization
+            self.getDeclaringClass() != other.getDeclaringClass())
+            throw new ClassCastException();
+        return self.ordinal - other.ordinal;
+}
+```
+
+`values()`
+
+是**编译器自动生成**的方法，Enum中并没有该方法，返回包括所有枚举变量的数组。编译自动生成意思就是源码的时候是查找不到。
+
+```java
+Season[] s = Season.values(); 
+        for (int i = 0;i < s.length ;i++ ){
+            System.out.println(s[i]);
+} 
+```
+
+#### 枚举类实现接口
+
+枚举类也可以实现接口。
+
+```java
+// 1 实现接口
+public class Main {
+    public static void main(String[] args) throws Exception {
+        Season a = Season.AUTUMN;
+        a.show(); //  Seasons
+    }
+}
+interface Info{
+    void show();
+}
+
+enum Season implements Info {
+    SPRING("春", "春暖花开"),
+    SUMMER("夏", "夏日炎炎"),
+    AUTUMN("秋", "秋高气爽"),
+    WINTER("冬", "冰冷刺骨");
+    private final String sName;
+    private final String sDesc;
+
+
+    private Season(String sName, String sDesc) {
+        this.sName = sName;
+        this.sDesc = sDesc;
+    }
+
+    public String getSname(){
+        return this.sName;
+    }
+    public String getSdesc(){
+        return this.sDesc;
+    }
+
+    @Override
+    public String toString() {
+        return "Season{" + "seasonName='" + getSname() + '\'' + ", seasonDesc='" + getSdesc() + '\'' + '}';
+    }
+    @Override
+    public void show() {
+        System.out.println("Seasons");
+    }
+}
+```
+
+进一步来对每一个对象来重写`show()`,这样每一个对象调用的都是不同的内容。
+
+```java
+public class Main {
+    public static void main(String[] args) throws Exception {
+        Season[] seasons = Season.values();
+        for (int i = 0; i < seasons.length; i++ ){
+            seasons[i].show();
+        } 
+    }
+  	// Spring
+    // Summer
+    // Autumn
+    // Winter
+}
+
+interface Info{
+    void show();
+}
+
+enum Season implements Info {
+    SPRING("春", "春暖花开"){
+        @Override
+        public void show() {
+            System.out.println("Spring");
+        }
+    },
+    SUMMER("夏", "夏日炎炎"){
+        @Override
+        public void show() {
+            System.out.println("Summer");
+        }
+    },
+    AUTUMN("秋", "秋高气爽"){
+        @Override
+        public void show() {
+            System.out.println("Autumn");
+        }
+    },
+    WINTER("冬", "冰冷刺骨"){
+        @Override
+        public void show() {
+            System.out.println("Winter");
+        }
+    };
+    private final String sName;
+    private final String sDesc;
+
+
+    private Season(String sName, String sDesc) {
+        this.sName = sName;
+        this.sDesc = sDesc;
+    }
+
+    public String getSname(){
+        return this.sName;
+    }
+    public String getSdesc(){
+        return this.sDesc;
+    }
+
+    @Override
+    public String toString() {
+        return "Season{" + "seasonName='" + getSname() + '\'' + ", seasonDesc='" + getSdesc() + '\'' + '}';
+    }
+}
+```
+
