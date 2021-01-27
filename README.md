@@ -3147,3 +3147,118 @@ Annotation 可以像修饰符一样被使用, 可用于修饰包,类, 构造器,
 @Deprecated: 用于表示所修饰的元素(类, 方法等)已过时。通常是因为 所修饰的结构危险或存在更好的选择
 
 @SuppressWarnings: 抑制编译器警告
+
+### 13 反射
+
+这个以我目前的水平。感觉反射就是一面镜子。本来是类→对象这样一个流程。反射就是倒推的干感觉。可以利用对象来推断出运行中的类。
+
+用来描述类的类。就是大的 `Class`
+
+javac 命令进行编译 会生成一个or多个字节码文件(.class结尾)。`Main.java → Main.class`
+
+java 对字节码文件进行解释运行，就是把字节码文件加载到内存里。`Main.class → 加载到内存` 这个过程就是类的加载。加载到内存里的类运行的类，就叫做运行类。这个加载进来的类，**Class 就是 一个实例。**<u>Class clazz = Person.class;本质就是类也是对象，是大的Class对象。</u>也是万物皆对象的体现。
+
+#### 使用反射和不使用反射区别在于？
+
+使用反射之前的Person实例操作
+
+```java
+// 1.新建实例对象
+Person p1 = new Person("Tom", 12);
+// 2.通过对象调用内部的方法和属性
+p1.age = 10;
+System.out.println(p1.toString());
+p1.show();
+// 在Person类外部，不可以调用内部私有结构
+// p1.name = "Amy";
+// p1.showNation();
+```
+
+使用反射之后的Person实例操作
+
+```java
+public static void main(String[] args) throws Exception {
+        Class clazz = Person.class;
+        Constructor cons = clazz.getConstructor(String.class, int.class);
+        Object obj = cons.newInstance("Jerry", 99); // 这里是一个Person 对象 需要显式看到的话可以强转
+  			Person p = (Person) obj;
+        System.out.println(obj); // Person{name='Jerry', age=99}
+  
+  			// 2. 调用对象指定的属性
+        Field age = clazz.getDeclaredField("age");
+        age.set(p, 100);
+        System.out.println(p.toString()); // Person{name='Jerry', age=100}
+
+        // 3.调用方法
+        Method show = clazz.getDeclaredMethod("show"); // 这里使用的是空参的show 如果需要有参数的继续看getDeclaredMethod
+  
+        // 调用函数的时候没有参数就可以不用
+        // show.invoke(obj, args) 有参数就用参数
+        show.invoke(p);
+}
+
+```
+
+#### 通过反射可以调用private结构吗？
+
+可以的。
+
+比如新建一个**私有构造器**。
+
+```java
+private Person(String name) {
+        this.name = name;
+}
+
+Class clazz = Person.class;
+Constructor con = clazz.getDeclaredConstructor(String.class);
+con.setAccessible(true);
+Object p = con.newInstance("TOMMY");
+System.out.println(p); // Person{name='TOMMY', age=0}
+```
+
+比如**私有属性**
+
+```java
+Class clazz = Person.class;
+Constructor con = clazz.getDeclaredConstructor(String.class);
+con.setAccessible(true);
+Object p = con.newInstance("TOMMY");
+
+// 属性名
+Field name = clazz.getDeclaredField("name");
+name.setAccessible(true);
+name.set(p, "Amy");
+System.out.println(p); // Person{name='Amy', age=0}
+```
+
+比如**私有方法**
+
+```java
+Class clazz = Person.class;
+Constructor con = clazz.getDeclaredConstructor(String.class);
+con.setAccessible(true);
+Object p = con.newInstance("TOMMY");
+
+Method showNation = clazz.getDeclaredMethod("showNation", String.class);
+showNation.setAccessible(true);
+// 相当于 String name = p.showNation("China")
+// 原来是对象调用方法，现在是方法需要对象支援
+showNation.invoke(p, "China"); // // 我的国籍是：China
+
+
+// 如果接收 return 返回值的话
+String nation = (String)showNation.invoke(p, "CHINAA"); // 这里需要强转的原因是返回的类型是Object
+System.out.println(nation); // CHINAA
+```
+
+#### 通过反射会破坏单例模式吗？什么时候使用反射什么时候面向对象？
+
+反射机制会与面向对象封装性有一定冲突和矛盾？
+
+封装性私有的方法 是内部使用方法，在内部调用过了。在**外部其实也用不着**，包括单例模式。即使反射可以调用内部私有对象，但没必要。可以，但没必要。
+
+<u>封装性只是建议你。反射是表示能不能。</u>
+
+直接new 对象是常态，反射只是在运行时，编译的时候没有确定，运行时候可以确定类的时候用反射。
+
