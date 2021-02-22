@@ -6,7 +6,7 @@
 
 ## 七大原则
 
-#### 单一职责原则(Single Responsibility Principle-SRP)
+### 单一职责原则(Single Responsibility Principle-SRP)
 
 简单的就是 **一个类一个职责**，一个职责并不代表就写一个方法一个代表，偏抽象的职责。
 
@@ -130,6 +130,219 @@ class Vehicle2 {
     }
     public void runSea(String vehicle){
         System.out.println(vehicle + " Sea run....");
+    }
+}
+```
+
+### 接口隔离原则（Interface Segregation Principle）
+
+客户端不应该依赖不需要的接口，即一个类对另一个类的依赖应该在最小的接口上。
+
+本质上就是说，如果一个接口有10个方法，但是你只用的上其中的5个。那么不是应该全部实现10个。而是应该去分解这个10个接口。
+
+**进化前**
+
+```java
+interface SegregationA1 {
+    void seA1();
+    void seA2();
+    void seA3();
+    void seA4();
+    void seA5();
+}
+
+class SegregationAB implements SegregationA1 {
+
+    @Override
+    public void seA1() {
+       System.out.println("SegregationAB seA1");
+    }
+
+    @Override
+    public void seA2() {
+        System.out.println("SegregationAB seA2");
+    }
+
+    @Override
+    public void seA3() {
+        System.out.println("SegregationAB seA3");
+    }
+
+    @Override
+    public void seA4() {
+        System.out.println("SegregationAB seA4");
+    }
+
+    @Override
+    public void seA5() {
+        System.out.println("SegregationAB seA5");
+    }
+}
+
+class SegregationAC implements SegregationA1 {
+
+    @Override
+    public void seA1() {
+       System.out.println("SegregationAD seA1");
+    }
+
+    @Override
+    public void seA2() {
+        System.out.println("SegregationAD seA2");
+    }
+
+    @Override
+    public void seA3() {
+        System.out.println("SegregationAD seA3");
+    }
+
+    @Override
+    public void seA4() {
+        System.out.println("SegregationAD seA4");
+    }
+
+    @Override
+    public void seA5() {
+        System.out.println("SegregationAD seA5");
+    }
+}
+
+// SegregationAD 通过接口 SegregationA1 去（依赖）使用 SegregationAB
+// 但是只会用A1 A2 A3
+// 这样的结果就是其实 SegregationAB 的 4和5白写了
+class SegregationAD {
+    public void depend1(SegregationA1 i) {
+        i.seA1();
+    }
+    public void depend2(SegregationA1 i) {
+        i.seA2();
+    }
+    public void depend3(SegregationA1 i) {
+        i.seA3();
+    }
+}
+
+// SegregationAE 通过接口 SegregationA1 去（依赖）使用 SegregationAC
+// 但是只会用A4 A5
+// 这样的结果就是其实 SegregationAC 的 2，3白写了
+class SegregationAE {
+   	public void depend1(SegregationA1 i) {
+        i.seA1();
+    }
+    public void depend4(SegregationA1 i) {
+        i.seA4();
+    }
+    public void depend5(SegregationA1 i) {
+        i.seA5();
+    }
+}
+```
+
+**进化后**
+
+实际上就是把上面的*SegregationA1*拆分成3份 需要什么实现什么 然后通过接口进行连接起来
+
+```java
+public class InterfaceSegregationB {
+    public static void main(String[] args) {
+
+        BBA bba = new BBA();
+        // BBA 通过 接口 去依赖 BA
+        bba.depend1(new SegregationBA()); // SegregationBA seA1
+        bba.depend2(new SegregationBA()); // SegregationBA seA2
+        bba.depend3(new SegregationBA()); // SegregationBA seA3
+
+        BBB bbb = new BBB();
+        // BBB 通过 接口 去依赖 BB
+        bbb.depend1(new SegregationBB()); // SegregationBB seA1
+        bbb.depend4(new SegregationBB()); // SegregationBB seA4
+        bbb.depend5(new SegregationBB()); // SegregationBB seA5
+    }
+}
+
+// 根据具体需求把上面进化前的接口拆分成了3份
+interface SegregationB1 {
+    void seA1();
+}
+
+interface SegregationB2 {
+    void seA2();
+
+    void seA3();
+}
+
+interface SegregationB3 {
+    void seA4();
+
+    void seA5();
+}
+
+// 分别进行实现 需要什么实现什么
+class SegregationBA implements SegregationB1, SegregationB2 {
+
+    @Override
+    public void seA1() {
+        System.out.println("SegregationBA seA1");
+    }
+
+    @Override
+    public void seA2() {
+        System.out.println("SegregationBA seA2");
+    }
+
+    @Override
+    public void seA3() {
+        System.out.println("SegregationBA seA3");
+    }
+
+}
+
+// 分别进行实现 需要什么实现什么
+class SegregationBB implements SegregationB1, SegregationB3 {
+
+    @Override
+    public void seA1() {
+        System.out.println("SegregationBB seA1");
+    }
+
+    @Override
+    public void seA4() {
+        System.out.println("SegregationBB seA4");
+    }
+
+    @Override
+    public void seA5() {
+        System.out.println("SegregationBB seA5");
+    }
+
+}
+
+class BBA {
+    // 这里就是放进去需要实现的接口
+    public void depend1(SegregationB1 i) {
+        i.seA1();
+    }
+
+    public void depend2(SegregationB2 i) {
+        i.seA2();
+    }
+
+    public void depend3(SegregationB2 i) {
+        i.seA3();
+    }
+}
+
+class BBB {
+    public void depend1(SegregationB1 i) {
+        i.seA1();
+    }
+
+    public void depend4(SegregationB3 i) {
+        i.seA4();
+    }
+
+    public void depend5(SegregationB3 i) {
+        i.seA5();
     }
 }
 ```
