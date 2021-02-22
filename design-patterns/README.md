@@ -347,3 +347,178 @@ class BBB {
 }
 ```
 
+### 依赖倒转原则（Dependence Inversion Principle）
+
+- 高层模块不应该依赖底层模块，相反，底层模块应该依赖抽象高层模块
+- 抽象不应该依赖细节。
+- 中心思想，面向接口编程。
+- 其实本质就是抽象思想。。各种具体的全部抽象起来，全部规范起来。用接口去完成。
+
+现在写一个例子看一下这个原则
+
+写一个Person接收信息的例子
+
+**进化前**
+
+```java
+public class DependenceInversionA {
+    public static void main(String[] args) {
+        PersonA p = new PersonA();
+        p.recieve(new EmailA()); // Email: Hello World
+    }
+}
+
+class EmailA {
+    public String getInfo() {
+        return "Email: Hello World";
+    }
+}
+
+// 方式1 分析
+// 1 简单
+// 2 但是如果这个时候接收的只是Email 有可能是微信 短信等等呢？
+// 这样就会无限增加类 Person也要增加方法
+// 3 解决思路：引入一个抽象接口，IReceiver 表示接收者
+// Person 和 IReceiver 就是在一起有依赖
+class PersonA {
+    public void recieve(EmailA email) {
+        System.out.println(email.getInfo());
+    }
+}
+```
+
+**进化后**
+
+```java
+public class DependenceInversionB {
+    public static void main(String[] args) {
+        PersonB p = new PersonB();
+        p.receive(new EmailB()); // Email....
+        p.receive(new Wechat()); // Wechat....
+    }
+}
+
+interface IReceiver {
+    public String getInfo();
+}
+
+// 这个方式是EmailB
+class EmailB implements IReceiver {
+    @Override
+    public String getInfo() {
+        return "Email....";
+    }
+}
+
+// 这个方式如果是Wechat
+class Wechat implements IReceiver {
+    @Override
+    public String getInfo() {
+        return "Wechat....";
+    }
+}
+
+class PersonB {
+    public void receive(IReceiver receiver) {
+        System.out.println(receiver.getInfo());
+    }
+}
+```
+
+依赖关系传递的3种方式
+
+- 接口传递
+- 构造方法传递
+- setter方式传递
+
+```java
+public class DependenceInversionC {
+    public static void main(String[] args) {
+        // // A 通过接口
+        // OpenClose oc = new OpenClose();
+        // oc.open(new Sony()); // Sony open
+
+        // // B 通过构造方法
+        // Sony s = new Sony();
+        // OpenClose oc = new OpenClose(s);
+        // oc.open(); // Sony open
+
+        // C 通过setter方法传递
+        OpenClose oc = new OpenClose();
+        oc.setTV(new Sony());
+        oc.open(); // Sony open
+
+
+    }
+}
+
+// // A 通过接口
+// interface SwitchOpenClose {
+//     void open(TV tv);
+// }
+
+// interface TV {
+//     void play();
+// }
+
+// // 实现接口
+// class OpenClose implements SwitchOpenClose {
+//     @Override
+//     public void open(TV tv) {
+//         tv.play();
+//     }
+// }
+
+// SONY实现
+class Sony implements TV {
+    @Override
+    public void play() {
+        System.out.println("Sony open");
+    }
+}
+
+// // B 通过构造方法
+// interface SwitchOpenClose {
+//     void open();
+// }
+
+// interface TV {
+//     void play();
+// }
+
+// class OpenClose implements SwitchOpenClose {
+//     public TV tv;
+//     // 这里通过构造器，这里需要传入一个实现类
+//     public OpenClose(TV tv) {
+//         this.tv = tv;
+//     }
+//     @Override
+//     public void open() {
+//         this.tv.play();
+//     }
+// }
+
+// C 通过setter方法传递
+interface SwitchOpenClose {
+    void open();
+    // 抽象方法，这里必须要实现，就会通过set方法进行初始化了
+    void setTV(TV tv);
+}
+
+interface TV {
+    void play();
+}
+
+class OpenClose implements SwitchOpenClose {
+    // 这里是私有的
+    private TV tv;
+    public void setTV(TV tv) {
+        this.tv = tv;
+    }
+    @Override
+    public void open() {
+        this.tv.play();
+    }
+}
+```
+
