@@ -1,2 +1,0 @@
-用来测试一下io.file类
-hello,test
