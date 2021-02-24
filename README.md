@@ -522,3 +522,119 @@ class OpenClose implements SwitchOpenClose {
 }
 ```
 
+### 里氏替换原则（Liskov Substitution）
+
+这个主要是对**继承**的一次大考验。主要就是说，如果子类继承了父类的方法
+
+- 全部重写 → 那干嘛继承
+- 重写太多 → 那样父类如果变化了 子类怎么办 重写的越多耦合性多大
+- **结论就是尽量不要重写父类的方法** 如果要改 就需要组合，聚合这样
+
+A类有1234方法 B类重写123方法 按照这个理论的话 那么建议A类和B类弄一个上层的更加BASE类。A和B之间的基础方法都给这个BASE类。
+
+那样就可以解耦合。聚合，组合，依赖这样来解决问题。
+
+**进化前**
+
+```java
+public class LiskovSubstitution {
+    public static void main(String[] args) {
+
+        LiskovA a = new LiskovA();
+        System.out.println("11 - 3 = " + a.func1(11, 3));
+        System.out.println("1 - 8 = " + a.func1(1, 8));
+
+        LiskovB b = new LiskovB();
+        // 这里的b是重写了func1 但是很容易就会忘记你已经重写了
+        System.out.println("11 - 3 = " + b.func1(11, 3));
+        System.out.println("1 - 8 = " + b.func1(1, 8));
+        System.out.println("11 + 3 + 9 = " + b.func2(11, 3));
+
+    }
+}
+
+/**
+ * A类
+ */
+class LiskovA {
+    public int func1(int num1, int num2) {
+        return num1 - num2;
+    }
+}
+
+/**
+ * B类
+ * 增加了一个新功能 在ab相加的基础上+9
+ */
+class LiskovB extends LiskovA {
+    // 这里可以无意识重写了
+    // 这时候就不满足里氏替换原则
+    public int func1(int a, int b) {
+        return a + b;
+    }
+
+    public int func2(int a, int b) {
+        return func1(a, b) + 9;
+    }
+}
+```
+
+**进化后**
+
+A和B 这里基本解耦 
+
+```java
+public class LiskovSubstitutionB {
+    public static void main(String[] args) {
+        LiskovAA a = new LiskovAA();
+        System.out.println("11 - 3 = " + a.func1(11, 3));
+        System.out.println("1 - 8 = " + a.func1(1, 8));
+
+        System.out.println("-------------------");
+        LiskovBB b = new LiskovBB();
+        // 因为BB不在继承AA类 所以调用不会再认为func1是减法了
+        // 调用的功能就会明确
+        System.out.println("11 + 3 = " + b.func1(11, 3));
+        System.out.println("1 + 8 = " + b.func1(1, 8));
+
+        // 使用组合依然可以使用到AA的相关方法
+        // 这里的func3 其实调用的是AA类的
+        System.out.println("11 - 3" + b.func3(11, 3));
+
+    }
+}
+
+
+class LiskovBase {
+}
+
+/**
+ * AA类
+ */
+class LiskovAA extends LiskovBase {
+    public int func1(int num1, int num2) {
+        return num1 - num2;
+    }
+}
+
+/**
+ * BB类
+ */
+class LiskovBB extends LiskovBase {
+    // 如果这个时候BB要使用AA的func1
+    private LiskovAA a = new LiskovAA();
+
+    public int func1(int a, int b) {
+        return a + b;
+    }
+
+    public int func2(int a, int b) {
+        return func1(a, b) + 9;
+    }
+
+    public int func3(int a, int b) {
+        return this.a.func1(a, b);
+    }
+}
+```
+
