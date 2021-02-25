@@ -638,3 +638,163 @@ class LiskovBB extends LiskovBase {
 }
 ```
 
+### 开闭原则（Open Closed Principle）
+
+这个很容易理解，因为用的多了。就是开，对外开放。闭，对内闭上。说这么多，其实就像获取的方法，谁都能获取。但是修改我的方法，缺不行。就是拓展可以扩展，但不能修改自身。
+
+- 最基础，最重要。
+- 一个软件实体如类，对函数和模块应该是扩展开放（对提供方），对修改关闭（对使用方）。用抽象构建框架，实现扩展细节。
+- 软件发生变化的时候不应该修改框架。
+- 编程中遵循其他原则，使用模式的目的就是遵循开闭原则
+
+**进化前**
+
+这里实现一个画各种图形的类。
+
+这里每次新增一个图形就要赠一个①1个if句②画图类的方法③一个新的图类
+
+优点 好理解，操作
+
+缺点 违反了ocp原则
+
+```java
+public class OpenClosedA {
+    public static void main(String[] args) {
+        GraphicEditorA g = new GraphicEditorA();
+        g.drawShape(new RectangleA());
+        g.drawShape(new CircleA());
+        g.drawShape(new TriangleA());
+    }
+}
+
+class GraphicEditorA {
+    /**
+     * 根据不同Shape对象 根据type 绘制不同图形
+     */
+    public void drawShape(ShapeA s) {
+        if (s.m_type == 1) {
+            drawRectangle(s);
+        } else if (s.m_type == 2) {
+            drawCircle(s);
+        } else if (s.m_type == 3){
+            drawTriangle(s);
+        }
+    }
+
+    public void drawRectangle(ShapeA r) {
+        System.out.println("绘制矩形");
+    }
+    public void drawCircle(ShapeA c) {
+        System.out.println("绘制圆型");
+    }
+    public void drawTriangle(ShapeA t) {
+        System.out.println("绘制三角形");
+    }
+}
+
+class ShapeA {
+    int m_type;
+}
+/**
+ * 矩形
+ */
+class RectangleA extends ShapeA {
+    RectangleA(){
+        super.m_type = 1;
+    }
+}
+
+/**
+ * 原型
+ */
+class CircleA extends ShapeA {
+    CircleA(){
+        super.m_type = 2;
+    }
+}
+
+/**
+ * 三角形【新增的话】
+ */
+class TriangleA extends ShapeA {
+    TriangleA(){
+        super.m_type = 3;
+    }
+}
+```
+
+**进化后**
+
+改进思路，把shape做成抽象类。提供一个*draw抽象方法*让子类分别去实现。这样直接利用多态就可以了。
+
+```java
+public class OpenClosedB {
+    public static void main(String[] args) {
+
+        GraphicEditorB g = new GraphicEditorB();
+        g.drawShape(new RectangleB());
+        g.drawShape(new CircleB());
+        g.drawShape(new TriangleB());
+        g.drawShape(new OtherGraphic());
+    }
+}
+
+class GraphicEditorB {
+
+    public void drawShape(ShapeB s) {
+        s.draw();
+    }
+}
+
+abstract class ShapeB {
+    int m_type;
+
+    public abstract void draw();
+}
+
+class RectangleB extends ShapeB {
+    RectangleB() {
+        super.m_type = 1;
+    }
+
+    @Override
+    public void draw() {
+        System.out.println("绘制矩形");
+    }
+}
+
+class CircleB extends ShapeB {
+    CircleB() {
+        super.m_type = 2;
+    }
+
+    @Override
+    public void draw() {
+        System.out.println("绘制圆形");
+    }
+}
+
+class TriangleB extends ShapeB {
+    TriangleB() {
+        super.m_type = 2;
+    }
+
+    @Override
+    public void draw() {
+        System.out.println("绘制三角形");
+    }
+}
+
+// 这个时候如果新增其他图像
+class OtherGraphic extends ShapeB {
+    OtherGraphic() {
+        super.m_type = 4;
+    }
+
+    @Override
+    public void draw() {
+        System.out.println("Other");
+    }
+}
+```
+
