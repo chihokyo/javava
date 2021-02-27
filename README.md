@@ -798,3 +798,225 @@ class OtherGraphic extends ShapeB {
 }
 ```
 
+### 迪米特法则（Demeter Principle）
+
+又叫最少原则，就是一个类对自己依赖的类知道的越少越好。
+
+这里我的理解，就是你的类的增删改查等等方法，不要把逻辑写在别的类下面。
+
+> 直接的朋友:**每个对象都会与其他对象有耦合关系**，只要两个对象之间有耦合关系，我们就说这两个对象之间 是朋友关系。耦合的方式很多，依赖，关联，组合，聚合等。其中，我们称出现**成员变量**，**方法参数**，**方法返回值**中的类为**直接的朋友**，而出现在**局部变量**中的类<u>不是直接的朋友</u>。也就是说，陌生的类最好不要以局部变量的形式出现在类的内部。
+
+
+
+这里有一个例子说了一下有什么区别
+
+有一个学校，下属有各个学院和总部，现在要求打印学校总部员工ID和学院员工ID。
+
+```java
+public class DemeterA {
+    public static void main(String[] args) {
+        SchoolManagerA s = new SchoolManagerA();
+        s.printAll(new CollegeManagerA());
+    }
+}
+
+/**
+ * 总部员工类
+ */
+class EmployeeA {
+    private String id;
+
+    public String getId() {
+        return this.id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+}
+
+/**
+ * 学院员工类
+ */
+
+class CollegeEmployeeA {
+    private String id;
+
+    public String getId() {
+        return this.id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+}
+
+/**
+ * 学院员工类-管理类
+ */
+class CollegeManagerA {
+
+    public List<CollegeEmployeeA> getAllEmploye() {
+        List<CollegeEmployeeA> list = new ArrayList<CollegeEmployeeA>();
+        for (int i = 0; i < 10; i++) {
+            CollegeEmployeeA emp = new CollegeEmployeeA();
+            emp.setId("CollegeEmployee id = " + i);
+            list.add(emp);
+        }
+        return list;
+    }
+}
+
+/**
+ * 总部员工类-管理类
+ */
+class SchoolManagerA {
+
+    public List<EmployeeA> getAllEmploye() {
+        List<EmployeeA> list = new ArrayList<EmployeeA>();
+        for (int i = 0; i < 5; i++) {
+            EmployeeA emp = new EmployeeA();
+            emp.setId("EmployeeA id = " + i);
+            list.add(emp);
+        }
+        return list;
+    }
+
+    /**
+     * 获取上面2者全部 
+     * 这里的 CollegeEmployee 不是 SchoolManager 的直接朋友
+     * CollegeEmployee 是以局部变量方式出现在 SchoolManager
+     * 违反了 迪米特法则
+     */
+    void printAll(CollegeManagerA sub) {
+
+        List<CollegeEmployeeA> list1 = sub.getAllEmploye();
+        System.out.println("-------CollegeEmployeeA-------");
+        for (CollegeEmployeeA collegeEmployeeA : list1) {
+            System.out.println(collegeEmployeeA.getId());
+        }
+
+        List<EmployeeA> list2 = this.getAllEmploye();
+        System.out.println("-------EmployeeA-------");
+        for (EmployeeA employeeA : list2) {
+            System.out.println(employeeA.getId());
+        }
+    }
+}
+```
+
+**进化后**
+
+其实这个法则这样看，一般人都不会写那种进化前的。
+
+```java
+public class DemeterB {
+    public static void main(String[] args) {
+        SchoolManagerB s = new SchoolManagerB();
+        s.printAll(new CollegeManagerB());
+    }
+}
+
+
+/**
+ * 总部员工类
+ */
+class EmployeeB {
+    private String id;
+
+    public String getId() {
+        return this.id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+}
+
+/**
+ * 学院员工类
+ */
+
+class CollegeEmployeeB {
+    private String id;
+
+    public String getId() {
+        return this.id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+}
+
+/**
+ * 学院员工类-管理类
+ */
+class CollegeManagerB {
+
+    // 新建10个学院员工
+    public List<CollegeEmployeeB> getAllCollegeEmploye() {
+        List<CollegeEmployeeB> list = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            CollegeEmployeeB emp = new CollegeEmployeeB();
+            emp.setId("CollegeEmployeeB id = " + i);
+            list.add(emp);
+        }
+        return list;
+    }
+    // 打印输出
+    public void printCollegeEmploye() {
+        List<CollegeEmployeeB> list = getAllCollegeEmploye();
+        System.out.println("-------CollegeEmployeeB-------");
+        for (CollegeEmployeeB collegeEmployeeB : list) {
+            System.out.println(collegeEmployeeB.getId());
+        }
+    }
+
+}
+
+/**
+ * 总部员工类-管理类
+ */
+class SchoolManagerB {
+
+     // 新建5个总部学院员工
+    public List<EmployeeB> getAllEmploye() {
+        List<EmployeeB> list = new ArrayList<EmployeeB>();
+        for (int i = 0; i < 5; i++) {
+            EmployeeB emp = new EmployeeB();
+            emp.setId("EmployeeB id = " + i);
+            list.add(emp);
+        }
+        return list;
+    }
+
+    /**
+     * 获取上面2者全部 
+     * 这里的 CollegeEmployee 不是 SchoolManager 的直接朋友
+     * CollegeEmployee 是以局部变量方式出现在 SchoolManager
+     * 违反了 迪米特法则
+     */
+    void printAll(CollegeManagerB sub) {
+        // 分析问题 
+        // 输出学院的员工方法 封装到 CollegeManagerB
+        sub.printCollegeEmploye();
+
+        List<EmployeeB> list2 = this.getAllEmploye();
+        System.out.println("-------EmployeeB-------");
+        for (EmployeeB employeeB : list2) {
+            System.out.println(employeeB.getId());
+        }
+    }
+}
+```
+
+- 迪米特法则的核心是降低类之间的耦合
+-  但是注意:由于每个类都减少了不必要的依赖，因此迪米特法则只是要求降低类间(对象间)耦合关系，并不是要求完全没有依赖关系
+
+### 合成复用原则（Composite Reuse Principle）
+
+**原则是尽量使用合成、聚合方式。而不是继承。**
+
