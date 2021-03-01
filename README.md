@@ -4,7 +4,7 @@
 
 设计模式感觉蛮有用的，具体代码写逻辑的时候感觉算法有用。在实际上写一个项目的时候感觉设计模式有用。
 
-## 七大原则
+## 1. 七大原则
 
 ### 单一职责原则(Single Responsibility Principle-SRP)
 
@@ -1019,4 +1019,480 @@ class SchoolManagerB {
 ### 合成复用原则（Composite Reuse Principle）
 
 **原则是尽量使用合成、聚合方式。而不是继承。**
+
+```java
+// 继承（泛化）
+class A {
+  method1();
+  method2();
+  method3();
+}
+class B exntends A {} 
+// 这样就是依赖
+class A {
+  method1(){};
+  method2(){};
+  method3(){};
+}
+class B {
+  method(A a){
+    a.method();
+  }
+} 
+// 聚合 通过set进行设置
+class A {
+  method1(){};
+  method2(){};
+  method3(){};
+}
+class B {
+ 	private A a;
+  setA(A a){};
+} 
+// 组合 这样在B有新实例的时候就自动实例化了A
+class A {
+  method1(){};
+  method2(){};
+  method3(){};
+}
+class B {
+  private A a = new A();
+  
+} 
+```
+
+- 找出应用中可能需要变化之处，把它们独立出来，不要和那些不需要变化的代码混在一起。
+-  针对接口编程，而不是针对实现编程
+  -  为了交互对象之间的松耦合设计而努力
+
+## 2. UML
+
+**Unified Modeling Language**
+
+UML 本身是一套符号的规定，就像数学符号和化学符号一样，这些符号用于描述软件模型中的各个元素和他 们之间的关系，比如类、接口、实现、泛化、依赖、组合、聚合等，如右图:
+
+![](https://raw.githubusercontent.com/chihokyo/image_host/master/20210301171039.png)
+
+类之间的关系有6种。
+
+**依赖，泛化（继承），实现，关联，聚合，组合。**
+
+#### UML图
+
+- 用例图(usecase)
+- 静态结构图:**类图**、对象图、包图、组件图、部署图 
+- 动态行为图:交互图(时序图与协作图)、状态图、活动图
+
+#### Dependence 依赖关系
+
+只要在类中用到了对象，他们就存在依赖关系。如果没有对象，编译无法通过。
+
+```java
+class PersonServiceBeanDep {
+    private PersonDaoDep personDaoDep;
+    public void save(PersonDep pd) {
+        
+    }
+    public IDCardDep getIDCardDep(Integer personID) {
+        return null;
+    }
+
+    public void modify() {
+        DepartmentDep departmentDep = new DepartmentDep();
+    }
+}
+
+class PersonDaoDep {}
+class IDCardDep {}
+class PersonDep {}
+class DepartmentDep {}
+```
+
+
+
+#### Generalization 泛化关系（继承关系，依赖关系特例）
+
+实际上就是上面的特例。存在关系，就是一种依赖关系。而继承关系，就是泛化关系。
+
+```java
+/**
+ * 泛化关系
+ * ー▷
+ * 有继承就是一种泛化关系
+ * 1) 泛化关系实际上就是继承关系
+ * 2) 如果A类继承了B类，我们就说A和B存在泛化关系
+ */
+
+abstract class DaoSupportGne {
+    public void sava(Object entity){
+
+    }
+    public void delete(Object id) {
+        
+    }
+}
+
+class PersonServiceBeanGne extends DaoSupportGne {
+
+}
+```
+
+
+
+#### Implementation 实现关系（依赖关系特例）
+
+就是B实现了A的接口。依赖关系特例。
+
+```java
+/**
+ * 实现关系
+ * 
+ * 就是接口实现而已
+ * ・・・・▷
+ */
+interface PersonServiceImpl {
+    public void delete(Integer id);
+}
+
+class PersonServiceBeanImpl implements PersonServiceImpl {
+    @Override
+    public void delete(Integer id) {
+        
+    }
+}
+```
+
+
+
+#### Association 关联关系 （依赖关系特例）
+
+**单向1对1关系**
+
+```java
+class PersonAssoA {
+    private IDCardAsso card;
+}
+
+class IDCardAsso {}
+```
+
+**双向1对1关系**
+
+```java
+class PersonAssoB {
+    private IDCardAssoB card;
+}
+
+class IDCardAssoB {
+    private PersonAssoB p;
+}
+```
+
+#### Aggregation 聚合关系
+
+```java
+/**
+ * 聚合关系
+ * 是一种整体和部分的关系。关联关系的特例。
+ * !!这里要和组合关系作为对比，这里的鼠标和显示器都是可以分离出来了
+ * 所以具有导航性，多重性
+ * 空心菱形
+ */
+class ComputerAgg {
+    private MouseAgg mouse;
+    private MonitorAgg monitor;
+
+    public void setMouse(MouseAgg mouse) {
+        this.mouse = mouse;
+    }
+    public void setMonitor(MonitorAgg monitor) {
+        this.monitor = monitor;
+    }
+}
+
+class MouseAgg {}
+class MonitorAgg {}
+```
+
+#### Composition 组合关系
+
+```java
+class ComputerCom {
+    // 这里就是一个组合，这个mouse 就是不可获取的
+    private MouseCom mouse = new MouseCom();
+    private MonitorCom monitor;
+
+    public void setMouse(MouseCom mouse) {
+        this.mouse = mouse;
+    }
+    public void setMonitor(MonitorCom monitor) {
+        this.monitor = monitor;
+    }
+}
+
+class MouseCom {}
+class MonitorCom {}
+```
+
+**组合和聚合的区别就在于，实例的是否可以分开。**
+
+## 3. 设计模式
+
+**什么是设计模式呢？**
+
+> 1. 设计模式是程序员在面对同类软件工程设计问题所总结出来的有用的经验，模式不是代码，而是某类问题的通 用解决方案，**设计模式(Design pattern)代表了最佳的实践**。这些解决方案是众多软件开发人员经过相当长的 一段时间的试验和错误总结出来的。
+> 2.  设计模式的本质提高软件的维护性，通用性和扩展性，并降低软件的复杂度。
+> 3.  <<设计模式>> 是经典的书，作者是 Erich Gamma、Richard Helm、Ralph Johnson 和 John Vlissides Design(俗称 “四人组 GOF”)
+> 4. 设计模式并不局限于某种语言，java，php，c++ 都有设计模式.
+
+**设计模式分类？**
+
+虽然这里写了23种，但是不限于这23种。
+
+- 创建型
+  - 单例，抽象工厂，原型，建造者，工厂
+- 结构型
+	- 适配器，桥接，装饰，组合，外观，享元，代理
+- 行为型
+	- 模块方法，命令，访问者，迭代器，观察者，中介者，备忘录，解释器，状态，策略，职责链
+
+
+### 单例模式（Singleton）
+
+> 就是采取一定的方法保证在整个的软件系统中，对某个类只能存在一个对象实例。并且该类只提供一个取得其对象实例的方法(静态方法)。
+
+实现方式，竟然有8种。一个个写吧。
+
+- **饿汉式(静态常量)**
+- **饿汉式(静态代码块)**
+- 懒汉式(线程不安全)
+- 懒汉式(线程安全，同步方法)
+- 懒汉式(线程安全，同步代码块) ❌
+- **双重检查**
+- **静态内部类**
+- **枚举**
+
+加粗的是推荐实现的
+
+**<u>饿汉式(静态常量)</u>**
+
+1. 优点:这种写法比较简单，就是在**类装载的时候就完成实例化（static）**。避免了线程同步问题。
+2.  缺点:在类装载的时候就完成实例化，没有达到LazyLoading的效果。如果从始至终从未使用过这个实例，则会造成**内存**的浪费
+3. 这种方式基于**classloder机制避免了多线程的同步问题**，不过，instance在**类装载**时就实例化，在单例模式中大 多数都是调用 getInstance 方法，但是导致类装载的原因有很多种，因此不能确定有其他的方式(或者其他的静 态方法)导致类装载，这时候初始化 instance 就没有达到 lazy loading 的效果
+
+```java
+class SingleTon {
+    // 1. 构造器私有化（防止new）
+    private SingleTon() {
+
+    }
+    // 2. 类的内部创建对象
+    private final static SingleTon instance = new SingleTon();
+
+    // 3. 暴露一个静态公共方法（为了获得实例对象）
+    public static SingleTon getInstance() {
+        return instance;
+    }
+}
+```
+
+**<u>饿汉式(静态代码块)</u>**
+
+本质和上面一样，只不过写在了static代码块里面
+
+```java
+class SingleTon {
+    private SingleTon(){
+
+    }
+    private static SingleTon instance;
+    // 区别于上一个静态常量 这里使用的是静态代码块
+    // 类加载的时候自动加载，所以会消耗一点资源
+    static {
+        instance = new SingleTon();
+    }
+    public static SingleTon getInstance() {
+        return instance;
+    }
+}
+```
+
+**懒汉式(线程不安全)**
+
+1. 起到了**LazyLoading**的效果，但是只能在单线程下使用。
+2.  如果在多线程下，一个线程进入了if(singleton==null)判断语句块，还未来得及往下执行，另一个线程也通过了这个判断语句，这时便会产生多个实例。所以在多线程环境下不可使用这种方式 
+3. 结论:在实际开发中，不要使用这种方式.
+
+```java
+class Singleton {
+    // 静态的实例
+    private static Singleton instance;
+    private Singleton() {}
+    // 提供一个公共方法 
+    // 使用这个方法的时候，才回去创建instance
+    // 不同于上面的饿汉是类加载就创建了
+    public static Singleton getInstance() {
+        if (instance == null) {
+            instance = new Singleton();
+        }
+        return instance;
+    }
+}
+
+```
+
+**懒汉式(线程安全，同步方法)**
+
+1. 解决了线程安全问题
+2. 效率太低了，每个线程在想获得类的实例时候，执行getInstance()方法都要进行同步。而其实这个方法只执行一次实例化代码就够了，后面的想获得该类实例，直接 return 就行了。方法进行同步效率太低 
+3. 结论:在实际开发中，不推荐使用这种方式
+
+```java
+class Singleton {
+    private static Singleton instance; 
+    private Singleton() {}
+    // 提供一个静态的公有方法
+    // 加入同步处理的代码，解决线程安全问题 
+    // 即懒汉式
+    public static synchronized Singleton getInstance() {
+        if(instance == null) {
+            instance = new Singleton();
+        }
+        return instance; 
+    }
+}
+
+```
+
+**懒汉式(线程安全，同步代码块)**❌
+
+```java
+class Singleton {
+    private static Singleton instance;
+
+    private Singleton() {
+    }
+
+    public static Singleton getInstance() {
+        if (instance == null) {
+            synchronized (Singleton.class) {
+                instance = new Singleton();
+            }
+        }
+        return instance;
+    }
+}
+```
+
+**双重检查**
+
+推荐使用！
+
+```
+1) Double-Check 概念是多线程开发中常使用到的，如代码中所示，我们进行了两次 if (singleton == null)检查，这 样就可以保证线程安全了。
+2) 这样，实例化代码只用执行一次，后面再次访问时，判断if(singleton==null)，直接return实例化对象，也避 免的反复进行方法同步.
+3) 线程安全;延迟加载;效率较高
+4) 结论:在实际开发中，推荐使用这种单例设计模式
+```
+
+
+
+```java
+lass Singleton {
+    // volatile 暂时可以理解成简易版本的 synchronized
+    private static volatile Singleton instance;
+
+    private Singleton() {
+    }
+
+    // 提供一个静态的公有方法，加入双重检查代码，
+    // 解决线程安全问题, 同时解决懒加载问题
+    public static synchronized Singleton getInstance() {
+        // 第一层判断 第一次实例化之后 第二次走这里就会直接return instance
+        // 如果为空就会进去
+        if (instance == null) {
+            // 线程安全判断
+            // 这段代码是同步代码，只能是1个线程进去之后
+            // 保证了只能是1个线程在下面的synchronized执行
+            // 加入有第2个线程已经进入到了这里 第1个还没有new到
+            // 但是下面这段代码是线程安全的，只能保证1个 所以在等待
+            synchronized (Singleton.class) {
+                // 这时候第1个出去了，第2个等待之后进来了
+                // 再一次的进行判断，发现1个实例已经创建了
+                // 所以也不会多于的创建新的实例对象
+                if (instance == null) {
+                    instance = new Singleton();
+                }
+            }
+        }
+        return instance;
+    }
+}
+```
+
+**静态内部类**
+
+```
+1) 这种方式采用了类装载的机制来保证初始化实例时只有一个线程。
+2) 静态内部类方式在Singleton类被装载时并不会立即实例化，而是在需要实例化时，调用getInstance方法，才会装载 SingletonInstance 类，从而完成 Singleton 的实例化。
+3) 类的静态属性只会在第一次加载类的时候初始化，所以在这里，JVM帮助我们保证了线程的安全性，在类进行初始化时，别的线程是无法进入的。
+4) 优点:避免了线程不安全，利用静态内部类特点实现延迟加载，效率高
+5) 结论:推荐使用.
+```
+
+
+
+```java
+class Singleton {
+    private static volatile Singleton instance;
+
+    // 构造器私有化
+    private Singleton() {
+
+    }
+
+    // 其实这里就是一个静态内部类，该类有一个属性 Singleton
+    private static class SingletonInstance {
+        private static final Singleton INSTANCE = new Singleton();
+    }
+
+    // 提供一个静态的公有方法，直接返回 SingletonInstance.INSTANCE
+    public static synchronized Singleton getInstance() {
+        return SingletonInstance.INSTANCE;
+    }
+}
+```
+
+**枚举类实现**
+
+1. 这借助JDK1.5中添加的枚举来实现单例模式。不仅能避免多线程同步问题，而且还能防止反序列化重新创建 新的对象。
+2. 这种方式是**EffectiveJava**作者**JoshBloch**提倡的方式
+3.  结论:**推荐使用**
+
+```java
+/**
+ * 枚举类实现
+ */
+public class SingleTonTest08 {
+    public static void main(String[] args) {
+        System.out.println("******测试-枚举类实现******");
+        Singleton instance = Singleton.INSTANCE;
+        Singleton instance2 = Singleton.INSTANCE;
+        System.out.println(instance == instance2);
+        System.out.println(instance.hashCode());
+        System.out.println(instance2.hashCode());
+        instance.method();
+        instance2.method();
+    }
+}
+
+// 使用枚举可以实现单例，这个是Effective java 作者推荐
+enum Singleton {
+    // 属性 因为在enum只有1个属性 保证是单例
+    INSTANCE;
+    public void method() {
+        System.out.println("OK");
+    }
+}
+```
 
