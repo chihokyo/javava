@@ -3,11 +3,11 @@ package com.design.pattern.factory.simplefactory;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
-
 public class OrderPizza2 {
-    
+
     Pizza pizza = null;
     String orderType = "";
+
     // 构造器
     public OrderPizza2() {
         do {
@@ -25,8 +25,7 @@ public class OrderPizza2 {
         } while (true);
     }
 
-
-    private String getType(){
+    private String getType() {
         String str = "";
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));

@@ -1,4 +1,5 @@
 package com.design.pattern.factory.simplefactory;
+
 /**
  * 起司类(继承披萨)
  */

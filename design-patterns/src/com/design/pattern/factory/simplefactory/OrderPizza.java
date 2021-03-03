@@ -7,12 +7,12 @@ import java.io.InputStreamReader;
  * 订购披萨
  */
 public class OrderPizza {
-    
+
     SimpleFactory simpleFactory;
     Pizza pizza = null;
-    
+
     // 构造器 订购披萨的时候要传入工厂对象
-    public OrderPizza( SimpleFactory simpleFactory) {
+    public OrderPizza(SimpleFactory simpleFactory) {
         setFactory(simpleFactory);
     }
 

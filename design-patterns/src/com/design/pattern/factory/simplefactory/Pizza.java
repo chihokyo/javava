@@ -1,4 +1,5 @@
 package com.design.pattern.factory.simplefactory;
+
 /**
  * 披萨类(抽象类)
  */
@@ -14,12 +15,14 @@ public abstract class Pizza {
     public void bake() {
         System.out.println(name + "baking");
     }
+
     public void cut() {
         System.out.println(name + "cuting");
     }
+
     // 打包
     public void box() {
         System.out.println(name + "cuting");
     }
-    
+
 }
