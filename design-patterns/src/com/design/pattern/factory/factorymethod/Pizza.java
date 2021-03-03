@@ -1,4 +1,4 @@
-package com.design.pattern.factory.simplefactory;
+package com.design.pattern.factory.factorymethod;
 
 /**
  * 披萨类(抽象类)
@@ -22,7 +22,7 @@ public abstract class Pizza {
 
     // 打包
     public void box() {
-        System.out.println(name + "box");
+        System.out.println(name + "boxing");
     }
 
 }

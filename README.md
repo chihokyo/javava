@@ -1508,6 +1508,292 @@ enum Singleton {
 
 其实用的就是分别继承。分别制作。
 
-简单工厂模式
+**简单工厂模式**
 
-大量的创造，批量的创造某种类的时候，jiu
+> 简单工厂模式是属于创建型模式，是工厂模式的一种。简单工厂模式是由一个工厂对象决定创建出哪一种产品类的实例。简单工厂模式是工厂模式家族中**最简单实用的模式**。
+
+> **定义一个创建对象的类，这个类来封装实例化对象的行为（代码）。**
+
+> 需要大量创造某种，某类对象的时候，就会使用到工厂模式。
+
+```java
+/**
+ * 简单工厂类 主要就是创造对象。创造的就是披萨对象。
+ */
+public class SimpleFactory {
+
+    // // 方法1
+    // // orderType 返回对应的对象
+    // public Pizza createPizza(String orderType) {
+
+    //     Pizza pizza = null;
+    //     System.out.println("****使用简单工厂模式****");
+    //     if (orderType.equals("greek")) {
+    //         pizza = new GreekPizza();
+    //         pizza.setName("希腊披萨");
+    //     } else if (orderType.equals("cheese")) {
+    //         pizza = new CheesePizza();
+    //         pizza.setName("奶酪披萨");
+    //     } else if (orderType.equals("pepper")) {
+    //         pizza = new PepperPizza();
+    //         pizza.setName("胡椒披萨");
+    //     }
+    //     return pizza;
+    // }
+
+    // 方法2
+    // 简单工厂模式 静态工厂模式
+    public static Pizza createPizza2(String orderType) {
+
+        Pizza pizza = null;
+        System.out.println("****使用简单工厂模式2****");
+        if (orderType.equals("greek")) {
+            pizza = new GreekPizza();
+            pizza.setName("希腊披萨");
+        } else if (orderType.equals("cheese")) {
+            pizza = new CheesePizza();
+            pizza.setName("奶酪披萨");
+        } else if (orderType.equals("pepper")) {
+            pizza = new PepperPizza();
+            pizza.setName("胡椒披萨");
+        }
+        return pizza;
+    }
+}
+
+```
+
+下面有一个订购披萨的类
+
+```java
+/**
+ * 订购披萨1
+ */
+public class OrderPizza {
+
+    SimpleFactory simpleFactory;
+    Pizza pizza = null;
+
+    // 构造器 订购披萨的时候要传入工厂对象
+    public OrderPizza(SimpleFactory simpleFactory) {
+        setFactory(simpleFactory);
+    }
+
+    public void setFactory(SimpleFactory simpleFactory) {
+        // 变量存储用户输入数据
+        String orderType = "";
+        this.simpleFactory = simpleFactory; // 设置简单工厂模式
+        do {
+            // 获取披萨种类
+            orderType = getType();
+            // 创造一个pizza实例
+            pizza = this.simpleFactory.createPizza(orderType);
+            // 进行准备工作
+            if (pizza != null) {
+                pizza.prepare();
+                pizza.bake();
+                pizza.cut();
+                pizza.box();
+            } else {
+                System.out.println("error");
+                break;
+            }
+        } while (true);
+    }
+
+    // 获取披萨种类
+    public String getType() {
+        String str = "";
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+            System.out.println("input 种类：");
+            str = br.readLine();
+            return str;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return str;
+    }
+}
+
+/**
+ * 订购披萨2
+ */
+public class OrderPizza2 {
+
+    Pizza pizza = null;
+    String orderType = "";
+
+    // 构造器
+    public OrderPizza2() {
+        do {
+            orderType = getType();
+            pizza = SimpleFactory.createPizza2(orderType);
+            if (pizza != null) {
+                pizza.prepare();
+                pizza.bake();
+                pizza.cut();
+                pizza.box();
+            } else {
+                System.out.println("error");
+                break;
+            }
+        } while (true);
+    }
+
+    private String getType() {
+        String str = "";
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+            System.out.println("input pizza 种类：");
+            str = br.readLine();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return str;
+    }
+}
+
+```
+
+其他的还有Pizza类和各种继承后的不同口味的披萨类。这里就不写了。可以参考<u>代码库</u>。
+
+**工厂方法模式**
+
+披萨项目新的需求:客户在点披萨时，可以点不同口味的披萨，比如 北京的奶酪 pizza、北京的胡椒 pizza 或 者是伦敦的奶酪 pizza、伦敦的胡椒 pizza。
+
+- 思路1
+
+使用简单工厂模式，创建不同的简单工厂类，比如 BJPizzaSimpleFactory、LDPizzaSimpleFactory 等等.从当前这个案例来说，也是可以的，但是考虑到项目的规模，以及软件的可维护性、可扩展性并不是特别好
+
+- 思路2
+
+工厂方法模式 → 这一次的主题。
+
+1) 工厂方法模式设计方案:将披萨项目的**实例化功能抽象成抽象方法**，在不同的口味点餐子类中具体实现。
+
+2) 工厂方法模式:定义了一个**创建对象的抽象方法**，由子类决定要实例化的类。工厂方法模式将对象的实例化推迟到子类。
+
+Pizz和继承的类先不写。主要是下面这个类。
+
+```java
+/**
+ * 抽象类 用来创建orderPizza
+ */
+public abstract class OrderPizza {
+
+    // 抽象方法让子类实现创造具体的实例
+    abstract Pizza createPizza(String orderType);
+
+    // 构造器用来创建实例
+    public OrderPizza() {
+        Pizza pizza = null;
+        String orderType;
+        do {
+            orderType = getType();
+            pizza = createPizza(orderType);
+            if (pizza != null) {
+                pizza.prepare();
+                pizza.bake();
+                pizza.cut();
+                pizza.box();
+            } else {
+                System.out.println("error");
+                break;
+            }
+        } while (true);
+    }
+
+    // 获取种类
+    private String getType() {
+
+        String str = "";
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+            System.out.println("input type: ");
+            str = br.readLine();
+            return str;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return str;
+
+    }
+
+}
+
+```
+
+下面只要有一个种类的就新建一个order专门pizza的类。
+
+```java
+/**
+ * 订购london披萨
+ */
+public class OrderLDPizza extends OrderPizza {
+    @Override
+    Pizza createPizza(String orderType) {
+        Pizza pizza = null;
+        if (orderType.equals("cheese")) {
+            pizza = new LDCheesePizza();
+        } else if (orderType.equals("pepper")) {
+            pizza = new LDPepperPizza();
+        }
+        return pizza;
+    }
+}
+
+
+/**
+ * 订购beijing披萨
+ */
+public class OrderBJPizza extends OrderPizza {
+    @Override
+    Pizza createPizza(String orderType) {
+        Pizza pizza = null;
+        if (orderType.equals("cheese")) {
+            pizza = new BJCheesePizza();
+        } else if (orderType.equals("pepper")) {
+            pizza = new BJPepperPizza();
+        }
+        return pizza;
+    }
+}
+
+```
+
+然后在PizzaStore里面直接写想订购的就可以。
+
+```java
+public class PizzaStore {
+    public static void main(String[] args) {
+        String local = PizzaStore.getLocal();
+        if (local.equals("beijing")) {
+            new OrderBJPizza();
+        } else if (local.equals("london")) {
+            new OrderLDPizza();
+        } else {
+            System.out.println("local error");
+        }
+    }
+
+    private static String getLocal() {
+
+        String str = "";
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+            System.out.println("input local: ");
+            str = br.readLine();
+            return str;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return str;
+
+    }
+}
+
+```
+
