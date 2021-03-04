@@ -1797,3 +1797,110 @@ public class PizzaStore {
 
 ```
 
+这时候进一步抽象下去。
+
+**抽象工厂模式**
+
+> 1. 抽象工厂模式:定义了一个**interface**用于创建相关或有依赖关系的对象簇，而无需指明具体的类
+> 2.  抽象工厂模式可以将简单工厂模式和工厂方法模式进行整合。
+> 3. 从设计层面看，抽象工厂模式就是对简单工厂模式的改进(或者称为进一步的抽象)。
+> 4. 将工厂抽象成两层，**AbsFactory(**抽象工厂**)** 和 具体实现的工厂子类。程序员可以根据创建对象类型使用对应的工厂子类。这样将单个的简单工厂类变成了工厂簇，更利于代码的维护和扩展。 
+
+也就是说先写一个接口工厂。这个接口是制造实例。但是最后就是一个种类一个工厂。
+
+```java
+/**
+ *　抽象工厂模式的抽象层 （接口）
+ */
+public interface AbsFactory {
+    // 具体类来实现
+    public Pizza createPizza(String orderType);
+}
+
+// 主要任务建造具体的实例
+public class BJFactory implements AbsFactory {
+    @Override
+    public Pizza createPizza(String orderType) {
+        System.out.println("抽象工厂模式 BJFactory");
+        Pizza pizza = null;
+        if (orderType.equals("cheese")) {
+            pizza = new BJCheesePizza();
+        } else if (orderType.equals("pepper")) {
+            pizza = new BJPepperPizza();
+        }
+        return pizza;
+    }
+}
+
+public class LDFactory implements AbsFactory {
+    @Override
+    public Pizza createPizza(String orderType) {
+        System.out.println("抽象工厂模式 LDFactory");
+        Pizza pizza = null;
+        if (orderType.equals("cheese")) {
+            pizza = new LDCheesePizza();
+        } else if (orderType.equals("pepper")) {
+            pizza = new LDPepperPizza();
+        }
+        return pizza;
+    }
+}
+
+// 点餐
+public class OrderPizza {
+
+    // 一个属性 存放工厂
+    AbsFactory absFactory;
+    // 构造器初始化工厂
+    public OrderPizza(AbsFactory absFactory) {
+        setFac(absFactory);
+    }
+    // 具体初始化实现
+    private void setFac(AbsFactory absFactory) {
+
+        Pizza pizza = null;
+        String orderType = "";
+        // 这里需要先放进来
+        this.absFactory = absFactory;
+        do {
+            // 根据具体类型放进去调用具体的工厂类
+            orderType = getType();
+            // 开始制造 其实这里用的是多态
+            pizza = absFactory.createPizza(orderType);
+            if (pizza != null) {
+                pizza.prepare();
+                pizza.bake();
+                pizza.cut();
+                pizza.box();
+            } else {
+                System.out.println("error");
+                break;
+            }
+        } while (true);
+    }
+
+    // 获取种类
+    private String getType() {
+
+        String str = "";
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+            System.out.println("input type: ");
+            str = br.readLine();
+            return str;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return str;
+
+    }
+}
+```
+
+写到现在，工厂感觉就是一个生产各种实例（对象）的工厂。感觉就像是媒婆似的。
+
+new这个行为都给工厂做，其他类不要做。这样以后修改的话，就只修改工厂就可以。
+
+尽量使用的是**继承抽象类or实现接口**。而不是**直接**继承具体类。
+
