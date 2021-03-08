@@ -1904,3 +1904,99 @@ new这个行为都给工厂做，其他类不要做。这样以后修改的话�
 
 尽量使用的是**继承抽象类or实现接口**。而不是**直接**继承具体类。
 
+### 原型模式（Prototype）
+
+先用传统方法复制羊
+
+> 1) 优点是比较好理解，简单易操作。
+> 2) 在创建新的对象时，总是需要重新获取原始对象的属性，如果创建的对象比较复杂时，效率较低 
+> 3) 总是需要重新初始化对象，而不是动态地获得对象运行时的状态, 不够灵活
+> 4) 改进的思路分析
+
+```java
+public class Client {
+    public static void main(String[] args) {
+
+        Sheep sheep = new Sheep("tom", 1, "white");
+
+        Sheep sheep2 = new Sheep(sheep.getName(), sheep.getAge(), sheep.getColor());
+        Sheep sheep3 = new Sheep(sheep.getName(), sheep.getAge(), sheep.getColor());
+        Sheep sheep4 = new Sheep(sheep.getName(), sheep.getAge(), sheep.getColor());
+        Sheep sheep5 = new Sheep(sheep.getName(), sheep.getAge(), sheep.getColor());
+        // ...
+
+        System.out.println(sheep); // { name='tom', age='1', color='white'}
+        System.out.println(sheep2); // { name='tom', age='1', color='white'}
+        System.out.println(sheep3); // { name='tom', age='1', color='white'}
+        System.out.println(sheep4); // { name='tom', age='1', color='white'}
+        System.out.println(sheep5); // { name='tom', age='1', color='white'}
+    }
+}
+```
+
+Java 中 Object 类是所有类的根类，Object 类提供了一个`clone()`方法，该方法可以将一个 Java 对象复制 一份，但是需要实现clone的Java类必须要实现一个接口`Cloneable`，该接口表示该类能够复制且具有复制的能力 => **原型模式**
+
+所以使用了这个之后的代码就是。
+
+```java
+/**
+ * 这里写一个羊 
+ * 实现 Cloneable 接口
+ */
+public class Sheep implements Cloneable {
+    // ...... 省略前面
+
+    // 克隆该实例，使用默认的 clone 方法来完成
+    @Override
+    protected Object clone() {
+        Sheep sheep = null;
+        try {
+            sheep = (Sheep)super.clone();
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        return sheep;
+    }
+
+}
+
+public class Client {
+    public static void main(String[] args) {
+        
+        Sheep sheep = new Sheep("Amy", 2, "black");
+        Sheep sheep2 = (Sheep)sheep.clone(); // 克隆
+        Sheep sheep3 = (Sheep)sheep.clone(); // 克隆
+        Sheep sheep4 = (Sheep)sheep.clone(); // 克隆
+        Sheep sheep5 = (Sheep)sheep.clone(); // 克隆
+
+        System.out.println("******使用克隆模式******");
+        System.out.println(sheep);
+        System.out.println(sheep2);
+        System.out.println(sheep3);
+        System.out.println(sheep4);
+        System.out.println(sheep5);
+
+        // 这个时候如果在增加一个属性的话，使用克隆就比较方便了。
+        // 不用再像上次的getXXX() 这样
+    }
+}
+
+```
+
+Spring 中原型 bean 的创建，就是**原型模式**的应用。
+
+#### 关于深拷贝和浅拷贝
+
+- 浅拷贝 `clone()`
+
+  基本数据类型 值传递（复制一份）
+
+  引用数据类型 引用传递（复制一份地址而已！这证明1个变，全变）
+
+- 深拷贝
+
+   复制对象的所有基本数据类型的成员变量值，为所有引用数据类型成员上申请存储空间。也就是对**整个对象(包括引用类型 默认没有引用类型)进行全部深入的拷贝。**
+
+  实现方式1 重写`clone()`  注意引用类型
+
+  实现方式2 通过对象序列化 推荐使用
