@@ -2082,3 +2082,257 @@ public class DeepPrototype implements Serializable, Cloneable {
 
 ```
 
+> 1. 创建新的对象比较复杂时，可以利用原型模式简化对象的创建过程，同时也能够提高效率
+> 2.  不用重新初始化对象，而是动态地获得对象运行时的状态
+> 3. 如果原始对象发生变化(增加或者减少属性)，其它克隆对象的也会发生相应的变化，无需修改代码
+> 4. 在实现深克隆的时候可能需要比较复杂的代码
+> 5.  缺点:需要为每一个类配备一个克隆方法，这对全新的类来说不是很难，但对已有的类进行改造时，需要修改其源代码，违背了 ocp 原则，需要注意。
+
+### 建造者模式（Builder）
+
+**又叫生成器模式。是对象构建模式，可以把复杂对象过程抽象出来。比如建造一个房子。**
+
+①需要建房子:这一过程为打桩、砌墙、封顶② 房子有各种各样的，比如普通房，高楼，别墅，各种房子的过程虽然一样，但是要求不要相同的
+
+**进化前**
+
+这种模式有缺点
+
+设计的程序结构，过于简单，没有设计缓存层对象，程序的扩展和维护不好. 也就是说，这种设计方案，把产品(即:房子) 和 创建产品的过程(即:建房子流程) 封装在一起，耦合性增强了。
+
+**<u>解决方案:将产品和产品建造过程解耦 => 建造者模式.</u>**
+
+```java
+/**
+ * 建造者模式进化前
+ * 抽象基类
+ */
+public abstract class AbstractHouse {
+    
+    public abstract void buildBasic();
+    public abstract void buildWalls();
+    public abstract void roofed();
+
+    public void build() {
+        buildBasic();
+        buildWalls();
+        roofed();
+    }
+}
+/**
+ * 建造者模式进化前
+ * 具体实现 CommonHouse
+ */
+public class CommonHouse extends AbstractHouse {
+    @Override
+    public void buildBasic() {
+        System.out.println("CommonHouse buildBasic...");
+    }
+
+    @Override
+    public void buildWalls() {
+        System.out.println("CommonHouse buildWalls...");
+    }
+
+    @Override
+    public void roofed() {
+        System.out.println("CommonHouse roofed...");
+    }
+
+}
+/**
+ * 建造者模式进化前 
+ * 具体实现 HighHouse
+ */
+public class HighHouse extends AbstractHouse {
+
+    @Override
+    public void buildBasic() {
+        System.out.println("HighHouse buildBasic...");
+    }
+
+    @Override
+    public void buildWalls() {
+        System.out.println("HighHouse buildBasic...");
+    }
+
+    @Override
+    public void roofed() {
+        System.out.println("HighHouse buildBasic...");
+    }
+
+}
+/**
+ * 开始建造
+ */
+public class ClientMain {
+    public static void main(String[] args) {
+        System.out.println("建造一个普通房子");
+        CommonHouse ch = new CommonHouse();
+        ch.build();
+        System.out.println("建造一个高房子");
+        HighHouse hh = new HighHouse();
+        hh.build();
+    }
+}
+```
+
+**进化之后**
+
+建造者模式的4个角色。
+
+1. Product(产品角色): 一个具体的产品对象。
+2. Builder(抽象建造者): 创建一个 Product 对象的各个部件指定的 **接口/抽象类。**
+3. ConcreteBuilder(具体建造者): **实现接口**，构建和装配各个部件。
+4. Director(指挥者): 构建一个使用 Builder 接口的对象。它主要是用于创建一个复杂的对象。它主要有两个作用，一是:隔离了客户与对象的生产过程，二是:负责控制产品对象的生产过程。可以自己组织建造流程，比如打2次地基。
+
+其实本质就是你有一个实际的产品，Product。你想生产，于是你弄了一个抽象的类or接口。Builder。然后具体实现就是ConcreteBuilder。指挥者就是指挥Builder 如何搞。
+
+![](https://raw.githubusercontent.com/chihokyo/image_host/master/20210309172527.png)
+
+虽然这里有图，但是具体实现的时候并不一定和图完全一致。只是要把产品和产品制作过程进行解耦。
+
+- 建造者模式不适用于差异化巨大的模型。
+- 和抽象工厂模式的对比的话，抽象工厂模式侧重于创建产品。而建造者要求中间的过程，类似于组装。
+
+**进化后**
+
+![](https://raw.githubusercontent.com/chihokyo/image_host/master/20210310000500.png)
+
+```java
+/**
+ * 进化后 
+ * 房子类（具体产品）
+ */
+public class House {省略}
+
+/**
+ * 抽象产品的建造 
+ * 定义一些方法在里面
+ */
+public abstract class HouseBuilder {
+
+    // 初始化一个房子
+    protected House house = new House();
+
+    // 抽象方法 这是流程
+    public abstract void buildBasic();
+
+    public abstract void buildWall();
+
+    public abstract void roofed();
+
+    // 返回一个房子
+    public House buildHouse() {
+        return house;
+    }
+
+}
+
+/**
+ * 指挥者
+ * 通过 houseBuilder 里面的各种方法
+ * 组合指挥如何进行建造一个房子 constructHouse
+ * 这里
+ */
+public class HouseDirector {
+
+    HouseBuilder houseBuilder = null;
+
+    public HouseDirector(HouseBuilder houseBuilder) {
+        this.houseBuilder = houseBuilder;
+    } 
+
+    // 和上面2选1 1个set 一个构造器
+    public void setHouseBuilder(HouseBuilder houseBuilder) {
+        this.houseBuilder = houseBuilder;
+    }
+    
+    // 建造方法
+    public House constructHouse() {
+        houseBuilder.buildBasic();
+        houseBuilder.buildWall();
+        houseBuilder.roofed();
+        return houseBuilder.buildHouse();
+    }
+
+}
+
+/**
+ * 普通房
+ */
+public class CommonBuilding extends HouseBuilder {
+
+    @Override
+    public void buildBasic() {
+        System.out.println("CommonBuilding buildBasic....");
+
+    }
+
+    @Override
+    public void buildWall() {
+        System.out.println("CommonBuilding buildWall....");
+
+    }
+
+    @Override
+    public void roofed() {
+        System.out.println("CommonBuilding roofed....");
+    }
+
+}
+/**
+ * 高楼
+ */
+public class HighBuilding extends HouseBuilder {
+
+    @Override
+    public void buildBasic() {
+        System.out.println("HighBuilding buildBasic....");
+
+    }
+
+    @Override
+    public void buildWall() {
+        System.out.println("HighBuilding buildWall....");
+
+    }
+
+    @Override
+    public void roofed() {
+        System.out.println("HighBuilding roofed....");
+    }
+
+}
+
+public class ClientMain {
+    public static void main(String[] args) {
+
+        System.out.println("建造一个普通房子");
+        CommonBuilding commonBuilding = new CommonBuilding();
+        // 构造器建造 放进去指挥者
+        HouseDirector houseDirector = new HouseDirector(commonBuilding);
+        House house = houseDirector.constructHouse();
+
+        System.out.println(house.toString());
+        System.out.println("建造一个高楼");
+
+        HighBuilding highBuilding = new HighBuilding();
+        // set方法建造 指挥者
+        houseDirector.setHouseBuilder(highBuilding);
+        houseDirector.constructHouse();
+
+    }
+}
+
+```
+
+#### 建造者模式在 JDK 的应用和源码分析
+
+![](https://raw.githubusercontent.com/chihokyo/image_host/master/20210310001253.png)
+
+**建造者模式所创建的产品一般具有较多的共同点，其组成部分相似，如果产品之间的差异性很大，则不适合使用建造者模式，因此其使用范围受到一定的限制**
+
+抽象工厂模式VS建造者模式 
+
+> 抽象工厂模式实现对产品家族的创建，一个产品家族是这样的一系列产品:具有不同分类维度的产品组合，采用抽象工厂模式不需要关心构建过程，只关心什么产品由什么工厂生产即可。而建造者模式则是要求按照指定 的蓝图建造产品，它的主要目的是通过组装零配件而产生一个新产品
