@@ -2336,3 +2336,248 @@ public class ClientMain {
 抽象工厂模式VS建造者模式 
 
 > 抽象工厂模式实现对产品家族的创建，一个产品家族是这样的一系列产品:具有不同分类维度的产品组合，采用抽象工厂模式不需要关心构建过程，只关心什么产品由什么工厂生产即可。而建造者模式则是要求按照指定 的蓝图建造产品，它的主要目的是通过组装零配件而产生一个新产品
+
+### 适配器模式
+
+适配器模式(AdapterPattern)将某个类的接口转换成客户端期望的另一个接口表示，主的目的是**兼容性**，让原本因接口不匹配不能一起工作的两个类可以协同工作。其别名为包装器(Wrapper)
+
+适配器模式属于结构型模式
+
+**类适配器，对象适配器，接口适配器模式。**
+
+说了这么多，不如写一些试一试。
+
+类适配器。比如我们有一个220V的交流电，需要适配器整成5V的直流电。
+
+```java
+/**
+ * 被适配的类
+ */
+public class Voltage220V {
+    public int output220V() {
+        int src = 220;
+        System.out.println("这里电压" + src + "V");
+        return src;
+    }
+}
+
+/**
+ * 一个5V直流电接口 
+ * 为什么是接口，我怀疑是可以用在所有的5V设备上
+ */
+public interface IVoltage5V {
+    public int output5V();
+}
+/**
+ * 适配器类
+ * 继承了220 实现了5
+ * 也就是说进去的是220 出来的是5 
+ * 这里实现的是输出的那个电压
+ */
+public class VoltageAdapter extends Voltage220V implements IVoltage5V {
+    @Override
+    public int output5V() {
+        // 获取 output220V 电压 这里用的是继承
+        int srcV = output220V();
+        int dstV = srcV / 44; // 转换成5v 事实上还有一些更细致的逻辑
+        return dstV;
+    }
+}
+
+/**
+ * 一个手机类
+ */
+public class Phone {
+    // 充电
+    // 这里转入的是你要适配的接口
+    public void charging(IVoltage5V iVoltage5V) {
+        if (iVoltage5V.output5V() == 5) {
+            System.out.println("OKK");
+        } else if(iVoltage5V.output5V() > 5 ) {
+            System.out.println("NOOOO!");
+        }
+    }
+}
+
+/**
+ * Main方法
+ */
+public class CilentMain {
+    public static void main(String[] args) {
+        System.out.println("类适配器模式");
+        Phone phone = new Phone();
+        // 这里给的适配器
+        phone.charging(new VoltageAdapter());
+    }
+}
+```
+
+这里最重要的关系就是一个
+
+```
+public class VoltageAdapter extends Voltage220V implements IVoltage5V
+```
+
+① Java是单继承机制，所以类适配器需要继承 src 类这一点算是一个缺点, 因为这要求 dst 必须是接口，有一定局限性;② src 类的方法在 Adapter 中都会暴露出来，也增加了使用的成本。③由于其继承了src类，所以它可以根据需求重写src类的方法，使得Adapter的灵活性增强了。
+
+因为根据合成复用原则 系统中尽量使用聚合代替继承关系。就有了下面的**对象适配器。**
+
+```java
+/**
+ * 被适配的类
+ */
+public class Voltage220V {
+    public int output220V() {
+        int src = 220;
+        System.out.println("电压" + src + "V");
+        return src;
+    }
+}
+
+public interface IVoltage5V {
+    public int output5V();
+}
+
+/**
+ * 适配器类
+ */
+public class VoltageAdapter implements IVoltage5V {
+
+    private Voltage220V voltage220v; // 关联关系 聚合
+
+    // 构造器 传入实例
+    public VoltageAdapter(Voltage220V voltage220v) {
+        this.voltage220v = voltage220v;
+    }
+
+    @Override
+    public int output5V() {
+        int dst = 0;
+        if (voltage220v != null) {
+            int src = voltage220v.output220V();
+            System.out.println("*****使用对象适配器 进行适配*****");
+            dst = src / 44;
+            System.out.println("适配完成，输出的电压为=" + dst);
+        }
+        return dst;
+    }
+
+}
+
+public class Phone {
+    // 充电
+    // 这里转入的是你要适配的接口
+    public void charging(IVoltage5V iVoltage5V) {
+        if (iVoltage5V.output5V() == 5) {
+            System.out.println("OKK");
+        } else if(iVoltage5V.output5V() > 5 ) {
+            System.out.println("NOOOO!");
+        }
+    }
+}
+```
+
+这里对比上面的代码，最重要的改动就是在这里。这里并没有继承220V那个类。而是通过对象的构造器进行初始化的时候传入一个220V对象。
+
+```java
+public class VoltageAdapter implements IVoltage5V {
+
+    private Voltage220V voltage220v; // 关联关系 聚合
+
+    // 构造器 传入实例
+    public VoltageAdapter(Voltage220V voltage220v) {
+        this.voltage220v = voltage220v;
+    }
+  .....
+```
+
+对象适配器和类适配器其实算是同一种思想，只不过实现方式不同。 根据合成复用原则，使用组合替代继承， 所以它解决了类适配器必须继承 src 的局限性问题，也不再要求 dst 必须是接口。
+
+使用成本更低，更灵活。
+
+一些书籍称为:适配器模式**(DefaultAdapterPattern)或缺省适配器模式。**
+
+核心思路。当不需要**全部实现接口**提供的方法时，可先设计一个**抽象类实现接口**，并为该接口中每个方法提供一个**默认实现(空方法)**，那么该**抽象类的子类可有选择地覆盖父类的某些方法**来实现需求
+
+```java
+/**
+ * 一个接口
+ */
+public interface InterfaceMethod {
+
+    public void methodA();
+    public void methodB();
+    public void methodC(); 
+    public void methodD();
+
+}
+
+/**
+ * 抽象类实现接口
+ */
+public abstract class AbsInterfaceMethodImpl implements InterfaceMethod {
+
+    // 先把接口InterfaceMethod的方法默认实现以下
+    // 其实抽象类不一定要实现接口全部方法
+    // 抽象类可以不用实现接口的全部方法
+
+    // 有的时候需要将接口和抽象类配合起来使用，
+    // 这样可以为开发者提供相当的便利性，开发者觉得哪个方便就选用哪个。
+    // 这样的抽象类称为便利类。此时，便利类并不需要实现接口的所有方法，可以留给继承它的子类去实现它们。
+
+    // 这么做并非是没有意义的，当你自己写的类想用接口中个别方法的时候（注意不是所有的方法），
+    // 那么你就可以用一个抽象类先实现这个接口（方法体中为空），
+    // 然后再用你的类继承这个抽象类，这样就可以达到你的目的了，
+    // 如果你直接用类实现接口，那是所有方法都必须实现的。
+
+    // 下面的方法默认都不实现的意义是防止后来不小心调用？
+    @Override
+    public void methodA() {
+    }
+
+    @Override
+    public void methodB() {
+
+    }
+
+    @Override
+    public void methodC() {
+
+    }
+
+    @Override
+    public void methodD() {
+
+    }
+}
+
+/**
+ * 想用哪个实现哪个
+ * 抽象类也可以new 本质是子类继承了然后只重写了部分方法
+ */
+public class CilentMain {
+    public static void main(String[] args) {
+        // 相当于弄了一个子类
+        AbsInterfaceMethodImpl  aImpl = new AbsInterfaceMethodImpl(){
+            @Override
+            public void methodA() {
+                System.out.println("我自己重写的哦");
+            }
+        };
+        aImpl.methodA();
+    }
+}
+```
+
+1. 三种命名方式，是根据src是以怎样的形式给到Adapter(在Adapter里的形式)来命名的。
+
+2. 类适配器:以类给到，在Adapter里，就是将src当做类，继承
+
+   对象适配器:以对象给到，在 Adapter 里，将 src 作为一个对象，持有
+
+   接口适配器:以接口给到，在 Adapter 里，将 src 作为一个接口，实现
+
+3. Adapter 模式最大的作用还是将原本不兼容的接口融合在一起工作。
+
+4. 实际开发中，实现起来不拘泥于我们讲解的三种经典形式
+
