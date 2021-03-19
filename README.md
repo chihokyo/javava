@@ -2337,7 +2337,7 @@ public class ClientMain {
 
 > 抽象工厂模式实现对产品家族的创建，一个产品家族是这样的一系列产品:具有不同分类维度的产品组合，采用抽象工厂模式不需要关心构建过程，只关心什么产品由什么工厂生产即可。而建造者模式则是要求按照指定 的蓝图建造产品，它的主要目的是通过组装零配件而产生一个新产品
 
-### 适配器模式
+### 适配器模式（Adapater）
 
 适配器模式(AdapterPattern)将某个类的接口转换成客户端期望的另一个接口表示，主的目的是**兼容性**，让原本因接口不匹配不能一起工作的两个类可以协同工作。其别名为包装器(Wrapper)
 
@@ -2581,3 +2581,155 @@ public class CilentMain {
 
 4. 实际开发中，实现起来不拘泥于我们讲解的三种经典形式
 
+### 桥接模式（Bridge）
+
+![](https://raw.githubusercontent.com/chihokyo/image_host/master/20210318235444.png)
+
+1. 扩展性问题(**类爆炸**)，如果我们再增加手机的样式(旋转式)，就需要增加各个品牌手机的类，同样如果我们增加一个手机品牌，也要在各个手机样式类下增加。
+2. 违反了**单一职责原则**，当我们增加手机样式时，要同时增加所有品牌的手机，这样增加了代码维护成本.
+3. 解决方案-使用**桥接**模式
+
+桥接模式的特点就是抽象和行为的实现进行分开。
+
+使用了桥接模式之后
+
+![](https://raw.githubusercontent.com/chihokyo/image_host/master/20210319000542.png)
+
+最后其实本质就是通过Phone这个类实现了桥接。是一座桥。
+
+**连接了具体的手机品牌和手机样式！**
+
+```java
+/**
+ * 桥接模式
+ * 品牌接口
+ */
+public interface Brand {
+    // 每个品牌都有开机关机打电话功能
+    void open();
+    void close();
+    void call();
+}
+
+/**
+ * 桥接模式 
+ * 这里的Phone就是一个桥梁，连接了具体的Brand和具体的手机样式
+ * 抽象 手机类
+ */
+public abstract class Phone {
+
+    // 通过聚合品牌
+    private Brand brand;
+
+    // 构造器初始化一个品牌
+    public Phone(Brand brand) {
+        super();
+        this.brand = brand;
+    }
+
+    // 这里就是实现了Brand这个接口的方法
+    protected void open() {
+        // 实际调用的是传入的具体的Phone对象
+        this.brand.open();
+    }
+
+    protected void close() {
+        // 不写也可以 反正这里就一个brand对象
+        brand.close();
+    }
+
+    protected void call() {
+        this.brand.call();
+    }
+}
+
+/**
+ * 具体的品牌实现
+ */
+public class Apple implements Brand {
+
+    @Override
+    public void open() {
+        System.out.println("Apple Brand open");
+    }
+
+    @Override
+    public void close() {
+        System.out.println("Apple Brand close");
+    }
+
+    @Override
+    public void call() {
+        System.out.println("Apple Brand call");
+    }
+
+}
+/**
+ * 继承Phone
+ * 手机样式类
+ */
+public class FoldedPhone extends Phone {
+
+    public FoldedPhone(Brand brand) {
+        super(brand);
+    }
+
+    @Override
+    protected void open() {
+        super.open();
+        System.out.println("FoldedPhone");
+    }
+
+    @Override
+    protected void close() {
+        super.close();
+        System.out.println("FoldedPhone");
+    }
+    @Override
+    protected void call() {
+        super.call();
+        System.out.println("FoldedPhone");
+    }
+    
+}
+
+public class ClienMain {
+    public static void main(String[] args) {
+        Phone phone1 = new FoldedPhone(new Apple());
+        phone1.open();
+        phone1.close();
+        phone1.call();
+        // Apple Brand open
+        // FoldedPhone
+        // Apple Brand close
+        // FoldedPhone
+        // Apple Brand call
+        // FoldedPhone
+
+        Phone phone2 = new FoldedPhone(new XiaoMi());
+        phone2.open();
+        phone2.close();
+        phone2.call();
+
+        Phone phone3 = new StrightPhone(new Apple());
+        phone3.open();
+        phone3.close();
+        phone3.call();
+
+        Phone phone4 = new StrightPhone(new XiaoMi());
+        phone4.open();
+        phone4.close();
+        phone4.call();
+    }
+}
+```
+
+①实现了抽象和实现部分的分离，从而极大的提供了系统的灵活性，让抽象部分和实现部分独立开来，这有助于系统进行分层设计，从而产生更好的结构化系统。 
+
+②对于系统的高层部分，只需要知道**抽象部分和实现部分**的接口就可以了，其它的部分由具体业务来完成。 
+
+③ **桥接模式替代多层继承方案**，可以减少子类的个数，降低系统的管理和维护成本。 
+
+④桥接模式的引入增加了系统的理解和设计难度，由于**聚合关联关系**建立在抽象层，要求开发者针对抽象进行设计和编程
+
+⑤ 桥接模式要求正确识别出系统中两个独立变化的维度**(**抽象、和实现**)**，因此其使用范围有一定的局限性，即需 要有这样的应用场景。 桥接模式其它应用场景 
